@@ -13,6 +13,8 @@ window.addEventListener('load', ->
   )
 
   game.on('turn', ->
+    game.addMonster(new Monster('grid bug', 5, 'x')) if (Math.random()*10 < 2)
+    game.moveAllMonsters()
     game.fire('turnend')
   )
 

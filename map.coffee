@@ -4,7 +4,6 @@
     ROOM = 2
     WALL_VERT = 3.1
     WALL_HORIZ = 3.2
-    _map = []
 
     initMap = (width, height) ->
       map = for i in [0 ... height]
@@ -72,10 +71,10 @@
       section
 
     constructor : (@width, @height) ->
-      _map = splitMap(initMap(@width, @height))
+      @_map = splitMap(initMap(@width, @height))
 
     show : () ->
-      str =  (for row in _map
+      str =  (for row in @_map
         (for cell in row
           switch cell
             when EMPTY then ' '
@@ -91,15 +90,11 @@
 
 
     isWalkable : (x, y) ->
-      if (_map[y] && _map[y][x] && [ROOM, PATH].indexOf(_map[y][x]) > -1) then true
+      if (@_map[y] && @_map[y][x] && [ROOM, PATH].indexOf(@_map[y][x]) > -1) then true
       else false
 
     setCell : (x, y, char) ->
-      _map[y][x] = char
+      @_map[y][x] = char
 
     getCell : (x, y) ->
-      _map[y][x]
-
-
-  map = new Map(80, 30)
-  map.show()
+      @_map[y][x]

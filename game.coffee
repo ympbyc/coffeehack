@@ -1,41 +1,42 @@
   class Game extends EventEmitter
-    mapStack = []
-    monsterStack = []
-
     constructor : ->
+      @monsterStack = []
+      @mapStack = []
       @level = -1
+      super()
 
     setPlayer : (@player) ->
 
     addMap : (map) ->
-      mapStack.push(map)
+      @mapStack.push(map)
 
     currentMap : ->
-      mapStack[@level]
+      @mapStack[@level]
 
     nextMap : ->
       @level++
-      mapStack[@level]
+      @mapStack[@level]
 
     prevMap : ->
       @level--
-      mapStack[@level]
+      @mapStack[@level]
 
     addMonster : (monster) ->
-      monsterStack.push(monster)
+      monster.born(@currentMap())
+      @monsterStack.push(monster)
 
     killMonster : (monster) ->
-      for i in [0...monsterStack.length]
-        if monsterStack[i] is monster then delete monsterStack[i]
+      for i in [0...@monsterStack.length]
+        if @monsterStack[i] is monster then delete @monsterStack[i]
 
     countMonster : ->
       ctr = 0
-      for m in mansterStack
+      for m in @monsterStack
         if m then ctr++
       ctr
 
     moveAllMonsters : ->
-      m.move() for m in monsterStack
+      m.move(@currentMap()) for m in @monsterStack
 
     drawStage : ->
       map = @currentMap()
@@ -45,7 +46,7 @@
 
 
       saveMonsterCell = []
-      for m in monsterStack
+      for m in @monsterStack
         if m
           monsterPos = m.getPosition()
           saveMonsterCell.push({x : monsterPos.x, y : monsterPos.y, save : map.getCell(monsterPos.x, monsterPos.y)})
