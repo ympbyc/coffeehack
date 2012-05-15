@@ -72,6 +72,7 @@
 
     constructor : (@width, @height) ->
       @_map = splitMap(initMap(@width, @height))
+      @reserved = []
 
     show : () ->
       str =  (for row in @_map
@@ -90,7 +91,7 @@
 
 
     isWalkable : (x, y) ->
-      if (@_map[y] && @_map[y][x] && [ROOM, PATH].indexOf(@_map[y][x]) > -1) then true
+      if (@_map[y] and @_map[y][x] and [ROOM, PATH].indexOf(@_map[y][x]) > -1 and not @isReserved(x, y)) then true
       else false
 
     setCell : (x, y, char) ->
@@ -98,3 +99,15 @@
 
     getCell : (x, y) ->
       @_map[y][x]
+
+    reservePosition : (x, y) ->
+      if not @reserved[y] then @reserved[y] = {}
+      if not @reserved[y][x] then @reserved[y][x] = true
+      else false
+
+    isReserved : (x, y) ->
+      if @reserved[y] and @reserved[y][x] then true
+      else false
+
+    clearReservation : (x, y) ->
+      @reserved[y][x] = null

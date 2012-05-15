@@ -1,9 +1,10 @@
   class Game extends EventEmitter
     constructor : ->
+      super()
       @monsterStack = []
       @mapStack = []
       @level = -1
-      super()
+      @time = 0
 
     setPlayer : (@player) ->
 
@@ -38,12 +39,14 @@
     moveAllMonsters : ->
       m.move(@currentMap()) for m in @monsterStack
 
+    turnInit : ->
+      @time++
+
     drawStage : ->
       map = @currentMap()
       playerPos = @player.getPosition()
       savePlayerCell = map.getCell(playerPos.x, playerPos.y)
       map.setCell(playerPos.x, playerPos.y, '@')
-
 
       saveMonsterCell = []
       for m in @monsterStack

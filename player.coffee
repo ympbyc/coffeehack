@@ -8,7 +8,9 @@
         x : Math.floor(Math.random()*map.width)
         y : Math.floor(Math.random()*map.height)
       }
-      if map.isWalkable(nextPos.x, nextPos.y) then @position = nextPos
+      if map.isWalkable(nextPos.x, nextPos.y)
+        @position = nextPos
+        map.reservePosition(@position.x, @position.y)
       else @born(map)
 
     walk : (map, direction) ->
@@ -19,7 +21,10 @@
         when DOWN then nextPos.y += 1
         when RIGHT then nextPos.x += 1
         when LEFT then nextPos.x -= 1
-      @position = nextPos if map.isWalkable(nextPos.x, nextPos.y)
+      if map.isWalkable(nextPos.x, nextPos.y)
+        map.clearReservation(@position.x, @position.y)
+        @position = nextPos
+        map.reservePosition(@position.x, @position.y)
 
     getPosition : ->
       @position

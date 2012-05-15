@@ -8,13 +8,14 @@ window.addEventListener('load', ->
   document.addEventListener('keydown', (e) ->
     direction = {75 : 'u', 74 : 'd', 76 : 'r',  72 : 'l'}
     if direction[e.keyCode]
-      game.player.walk(map, direction[e.keyCode])
-      game.fire('turn')
+      game.fire('turn', {direction : direction[e.keyCode]})
   )
 
-  game.on('turn', ->
+  game.on('turn', (e) ->
+    game.turnInit()
     game.addMonster(new Monster('grid bug', 5, 'x')) if (Math.random()*10 < 2)
     game.moveAllMonsters()
+    game.player.walk(map, e.direction)
     game.fire('turnend')
   )
 
