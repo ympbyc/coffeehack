@@ -1,7 +1,10 @@
   class Player extends EventEmitter
     constructor : (@name, @role, @hp) ->
-      @_position = {}
       super()
+      @_position = {}
+      @on('godown', ((e) ->
+        e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
+      ).bind(@))
 
     born : (map) ->
       nextPos = {
@@ -32,7 +35,6 @@
 
     attack : (enemy) ->
       TEMPORARY_MAGIC_NUMBER = 2
-      alert(enemy.hp)
       enemy.hp -= TEMPORARY_MAGIC_NUMBER
 
     isDead : ->

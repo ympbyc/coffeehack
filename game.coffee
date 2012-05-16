@@ -1,24 +1,24 @@
   class Game extends EventEmitter
     constructor : ->
       super()
-      @monsterStack = []
+      @monsterStack = [[]]
       @mapStack = []
       @level = -1
       @time = 0
       @on('turn', (->
         @turnInit()
-      ).bind(this))
+      ).bind(@))
       @on('turnend', (->
         @turnEnd()
-      ).bind(this))
+      ).bind(@))
 
     setPlayer : (@player) ->
       @player.on('move', ((e) ->
-#        pos = @player.getPosition()
-#        nearby = @currentMap().getNearByCells(pos.x, pos.y)
-#        for cell in nearby
-#          cell.attack(@player) if cell
-      ).bind(this))
+        pos = @player.getPosition()
+        nearby = @currentMap().getNearByCells(pos.x, pos.y)
+        for cell in nearby
+          cell.attack(@player) if cell
+      ).bind(@))
 
     addMap : (map) ->
       @mapStack.push(map)
@@ -27,39 +27,46 @@
       @mapStack[@level]
 
     nextMap : ->
+      @player.fire('godown', {prevMap : @currentMap()})
       @level++
+      @levelInit()
       @mapStack[@level]
 
     prevMap : ->
       @level--
       @mapStack[@level]
 
+    levelInit : ->
+      @monsterStack.push([]) if not @monsterStack[@level]
+
     addMonster : (monster) ->
       monster.born(@currentMap())
-      @monsterStack.push(monster)
+      @monsterStack[@level].push(monster)
 
     killMonsters : ->
-      for i in [0...@monsterStack.length]
-        if @monsterStack[i] and @monsterStack[i].isDead()
-          @monsterStack[i].fire('die')
-          pos = @monsterStack[i].getPosition()
+      ms = @monsterStack[@level]
+      for i in [0...ms.length]
+        if ms[i] and ms[i].isDead()
+          ms[i].fire('die')
+          pos = ms[i].getPosition()
           @currentMap().clearReservation(pos.x, pos.y)
-          delete @monsterStack[i]
+          delete ms[i]
 
     countMonster : ->
       ctr = 0
-      for m in @monsterStack
+      for m in @monsterStack[@level]
         if m then ctr++
       ctr
 
     moveAllMonsters : ->
-      for m in @monsterStack
+      for m in @monsterStack[@level]
         if m
           m.move(@currentMap())
           m.fire('move')
 
     turnInit : ->
       @time++
+      @player.hp++
 
     turnEnd : ->
       @killMonsters()
@@ -72,7 +79,7 @@
       map.setCell(playerPos.x, playerPos.y, '@')
 
       saveMonsterCell = []
-      for m in @monsterStack
+      for m in @monsterStack[@level]
         if m
           monsterPos = m.getPosition()
           saveMonsterCell.push({x : monsterPos.x, y : monsterPos.y, save : map.getCell(monsterPos.x, monsterPos.y)})
