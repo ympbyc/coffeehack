@@ -5,6 +5,9 @@
       @on('godown', ((e) ->
         e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
       ).bind(@))
+      @on('goup', ((e) ->
+        e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
+      ).bind(@))
 
     born : (map) ->
       nextPos = {

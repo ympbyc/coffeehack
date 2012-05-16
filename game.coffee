@@ -33,6 +33,7 @@
       @mapStack[@level]
 
     prevMap : ->
+      @player.fire('goup', {prevMap : @currentMap()})
       @level--
       @mapStack[@level]
 
