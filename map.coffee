@@ -6,6 +6,8 @@
     @WALL_HORIZ = 3.2
     @STAIR_UP = 4.1
     @STAIR_DOWN = 4.2
+    @TRAP = 5
+    @ITEM = 6
 
     initMap = (width, height) ->
       map = for i in [0 ... height]
@@ -73,13 +75,16 @@
 
     createSpecialCells = (map) ->
       map = map.concat([])
-      f = (type) ->
-        x = Math.floor(Math.random()*map[0].length); y = Math.floor(Math.random()*map.length)
-        if map[y][x] and map[y][x] is Map.ROOM
-          map[y][x] =  type
-        else f(type)
+      f = (type, occurance=1) ->
+        if occurance
+          x = Math.floor(Math.random()*map[0].length); y = Math.floor(Math.random()*map.length)
+          if map[y][x] and map[y][x] is Map.ROOM
+            map[y][x] =  type
+            f(type, occurance--)
+          else f(type, occurance)
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
+      f(Map.TRAP, Math.floor(Math.random()*20))
       map
 
     constructor : (@width, @height) ->
@@ -94,6 +99,7 @@
             when Map.WALL_VERT then '|'
             when Map.WALL_HORIZ then '-'
             when Map.ROOM then '.'
+            when Map.Trap then '.'
             when Map.PATH then '#'
             when Map.STAIR_UP then '<'
             when Map.STAIR_DOWN then '>'

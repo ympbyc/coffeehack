@@ -13,10 +13,6 @@
       ).bind(@))
 
     setPlayer : (@player) ->
-      @player.on('attack', ((e) ->
-        mode = if e.enemy.isDead() then 'You killed the ' else 'You hit the '
-        @fire('message', {message : mode + e.enemy.role + '.'})
-      ).bind(@))
 
     addMap : (map) ->
       @mapStack.push(map)
@@ -41,11 +37,6 @@
     addMonster : (monster) ->
       monster.born(@currentMap())
       @monsterStack[@level].push(monster)
-      monster.on('attack', ((e) ->
-        tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
-        action = if Math.round(Math.random()) then e.me.action else 'hits'
-        @fire('message', {message : ['the', e.me.role, action, tgt+'.'].join(' ')})
-      ).bind(@))
 
     killMonsters : ->
       ms = @monsterStack[@level]
