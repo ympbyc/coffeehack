@@ -13,11 +13,9 @@
       ).bind(@))
 
     setPlayer : (@player) ->
-      @player.on('move', ((e) ->
-        pos = @player.getPosition()
-        nearby = @currentMap().getNearByCells(pos.x, pos.y)
-        for cell in nearby
-          cell.attack(@player) if cell
+      @player.on('attack', ((e) ->
+        mode = if e.enemy.isDead() then 'You killed the ' else 'You hit the '
+        @fire('message', {message : mode + e.enemy.role + '.'})
       ).bind(@))
 
     addMap : (map) ->
@@ -43,12 +41,16 @@
     addMonster : (monster) ->
       monster.born(@currentMap())
       @monsterStack[@level].push(monster)
+      monster.on('attack', ((e) ->
+        tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
+        action = if Math.round(Math.random()) then e.me.action else 'hits'
+        @fire('message', {message : ['the', e.me.role, action, tgt+'.'].join(' ')})
+      ).bind(@))
 
     killMonsters : ->
       ms = @monsterStack[@level]
       for i in [0...ms.length]
         if ms[i] and ms[i].isDead()
-          ms[i].fire('die')
           pos = ms[i].getPosition()
           @currentMap().clearReservation(pos.x, pos.y)
           delete ms[i]
@@ -67,7 +69,7 @@
 
     turnInit : ->
       @time++
-      @player.hp++
+      @player.hp += 0.2 if @player.hp < @player.getMaxHP()
 
     turnEnd : ->
       @killMonsters()

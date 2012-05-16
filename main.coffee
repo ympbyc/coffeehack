@@ -1,11 +1,14 @@
 commands =  if require? then require('commands') else window.commands
+monsterlist =  if require? then require('monsterlist') else window.monsterlist
 
 window.addEventListener('load', ->
   game = new Game()
-  game.setPlayer(new Player('ympbyc', 'Samurai', 20))
+  game.setPlayer(new Player('ympbyc', 'Samurai', 12))
   game.addMap(new Map(80, 30))
   game.nextMap()
   game.player.born(game.currentMap())
+
+  message = ' '
 
   document.addEventListener('keypress', (e) ->
     direction = {107 : 'u', 106 : 'd', 108 : 'r',  104 : 'l'} #kjlh
@@ -19,13 +22,22 @@ window.addEventListener('load', ->
   )
 
   game.on('turn', ->
-    game.addMonster(new Monster('grid bug', 5, 'x')) if (Math.random()*10 < 0.5)
+    game.addMonster(new Monster(monsterlist[Math.floor(Math.random()*monsterlist.length)]...)) if (Math.random()*10 < 0.5)
     game.moveAllMonsters()
     game.fire('turnend')
   )
 
   game.on('turnend', ->
     document.getElementById('jshack').innerHTML = game.drawStage()
+    status = [game.player.name, '@ level', game.level, '\n',
+      'hp:', game.player.hp, '/', game.player.getMaxHP(), 'exp:', game.player.experience, 'time:', game.time
+    ].join(' ')
+    game.fire('status', {status : status})
+  )
+
+  game.on('turnend', ->
+    document.getElementById('message').innerHTML = message
+    message = ' '
   )
 
   game.on('godown', ->
@@ -39,7 +51,7 @@ window.addEventListener('load', ->
   )
 
   game.on('message', (e) ->
-    document.getElementById('message').innerHTML = e.message
+    message += ' ' + e.message
   )
 
   game.on('status', (e) ->
