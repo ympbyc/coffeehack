@@ -1,6 +1,6 @@
 window.addEventListener('load', ->
   game = new Game()
-  game.setPlayer(new Player('ympbyc', 'Samurai'))
+  game.setPlayer(new Player('ympbyc', 'Samurai', 20))
   game.addMap(new Map(80, 30))
   map = game.nextMap()
   game.player.born(map)
@@ -12,7 +12,6 @@ window.addEventListener('load', ->
   )
 
   game.on('turn', (e) ->
-    game.turnInit()
     game.addMonster(new Monster('grid bug', 5, 'x')) if (Math.random()*10 < 2)
     game.moveAllMonsters()
     game.player.walk(map, e.direction)

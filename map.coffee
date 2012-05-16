@@ -91,7 +91,7 @@
 
 
     isWalkable : (x, y) ->
-      if (@_map[y] and @_map[y][x] and [ROOM, PATH].indexOf(@_map[y][x]) > -1 and not @isReserved(x, y)) then true
+      if (@_map[y] and @_map[y][x] and [ROOM, PATH].indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
       else false
 
     setCell : (x, y, char) ->
@@ -100,14 +100,26 @@
     getCell : (x, y) ->
       @_map[y][x]
 
-    reservePosition : (x, y) ->
+    reserveCell : (x, y, obj) ->
       if not @reserved[y] then @reserved[y] = {}
-      if not @reserved[y][x] then @reserved[y][x] = true
-      else false
+      if not @reserved[y][x] then @reserved[y][x] = obj
+      else throw 'cell already reserved'
 
-    isReserved : (x, y) ->
-      if @reserved[y] and @reserved[y][x] then true
+    getReservation : (x, y) ->
+      if @reserved[y] and @reserved[y][x] then @reserved[y][x]
       else false
 
     clearReservation : (x, y) ->
       @reserved[y][x] = null
+
+    getNearByCells : (x, y) ->
+      [
+        @getReservation(x+1, y),
+        @getReservation(x-1, y),
+        @getReservation(x, y+1),
+        @getReservation(x, y-1),
+        @getReservation(x+1, y+1),
+        @getReservation(x-1, y+1),
+        @getReservation(x+1, y-1),
+        @getReservation(x-1, y-1)
+      ]

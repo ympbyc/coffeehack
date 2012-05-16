@@ -5,8 +5,20 @@
       @mapStack = []
       @level = -1
       @time = 0
+      @on('turn', (->
+        @turnInit()
+      ).bind(this))
+      @on('turnend', (->
+        @turnEnd()
+      ).bind(this))
 
     setPlayer : (@player) ->
+      @player.on('move', ((e) ->
+#        pos = @player.getPosition()
+#        nearby = @currentMap().getNearByCells(pos.x, pos.y)
+#        for cell in nearby
+#          cell.attack(@player) if cell
+      ).bind(this))
 
     addMap : (map) ->
       @mapStack.push(map)
@@ -26,9 +38,13 @@
       monster.born(@currentMap())
       @monsterStack.push(monster)
 
-    killMonster : (monster) ->
+    killMonsters : ->
       for i in [0...@monsterStack.length]
-        if @monsterStack[i] is monster then delete @monsterStack[i]
+        if @monsterStack[i] and @monsterStack[i].isDead()
+          @monsterStack[i].fire('die')
+          pos = @monsterStack[i].getPosition()
+          @currentMap().clearReservation(pos.x, pos.y)
+          delete @monsterStack[i]
 
     countMonster : ->
       ctr = 0
@@ -37,10 +53,17 @@
       ctr
 
     moveAllMonsters : ->
-      m.move(@currentMap()) for m in @monsterStack
+      for m in @monsterStack
+        if m
+          m.move(@currentMap())
+          m.fire('move')
 
     turnInit : ->
       @time++
+
+    turnEnd : ->
+      @killMonsters()
+      alert 'you died' if @player.isDead()
 
     drawStage : ->
       map = @currentMap()

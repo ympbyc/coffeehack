@@ -11,4 +11,4 @@
 
     fire : (type, obj) ->
       for item in @listenerStack
-        return item.listener(obj) if item and item.type is type
+        item.listener(obj) if item and item.type is type
