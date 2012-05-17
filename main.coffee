@@ -1,24 +1,79 @@
+commands =  if require? then require('commands') else window.commands
+monsterlist =  if require? then require('monsterlist') else window.monsterlist
+
 window.addEventListener('load', ->
   game = new Game()
-  game.setPlayer(new Player('ympbyc', 'Samurai', 20))
+  game.setPlayer(new Player('ympbyc', 'Samurai', 12))
   game.addMap(new Map(80, 30))
-  map = game.nextMap()
-  game.player.born(map)
+  game.nextMap()
+  game.player.born(game.currentMap())
 
-  document.addEventListener('keydown', (e) ->
-    direction = {75 : 'u', 74 : 'd', 76 : 'r',  72 : 'l'}
+  message = ' '
+
+  document.addEventListener('keypress', (e) ->
+    direction = {107 : 'u', 106 : 'd', 108 : 'r',  104 : 'l'} #kjlh
     if direction[e.keyCode]
-      game.fire('turn', {direction : direction[e.keyCode]})
+      game.player.walk(game.currentMap(),  direction[e.keyCode])
+
+    if commands[e.keyCode]
+      commands[e.keyCode](game)
+
+    game.fire('turn')
   )
 
-  game.on('turn', (e) ->
-    game.addMonster(new Monster('grid bug', 5, 'x')) if (Math.random()*10 < 2)
+  game.on('turn', ->
+    if (Math.random()*10 < 0.5)
+      monster = new Monster(monsterlist[Math.floor(Math.random()*(monsterlist.length-1))]...)
+      monster.on('attack', (e) ->
+        tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
+        action = if Math.round(Math.random()) then e.me.action else 'hits'
+        game.fire('message', {message : ['the', e.me.role, action, tgt+'.'].join(' ')})
+      )
+      game.addMonster(monster)
     game.moveAllMonsters()
-    game.player.walk(map, e.direction)
     game.fire('turnend')
   )
 
   game.on('turnend', ->
     document.getElementById('jshack').innerHTML = game.drawStage()
+    status = [game.player.name, '@ level', game.level, '\n',
+      'hp:', game.player.hp, '/', game.player.getMaxHP(), 'exp:', game.player.experience, 'time:', game.time
+    ].join(' ')
+    game.fire('status', {status : status})
+  )
+
+  game.on('turnend', ->
+    document.getElementById('message').innerHTML = message
+    message = ' '
+  )
+
+  game.on('godown', ->
+    game.addMap(new Map(80, 30))
+    game.nextMap()
+    game.player.born(game.currentMap())
+  )
+  game.on('goup', ->
+    game.prevMap()
+    game.player.born(game.currentMap())
+  )
+
+  game.on('message', (e) ->
+    message += ' ' + e.message
+  )
+
+  game.on('status', (e) ->
+    document.getElementById('status').innerHTML = e.status
+  )
+
+  game.player.on('attack', (e) ->
+    mode = if e.enemy.isDead() then 'You killed the ' else 'You hit the '
+    game.fire('message', {message : mode + e.enemy.role + '.'})
+  )
+
+  game.player.on('move', (e) ->
+    if game.currentMap().getCell(e.position.x, e.position.y) is Map.TRAP
+      pp = game.player.getPosition()
+      game.currentMap().setCell(pp.x, pp.y, '^')
+      traplist[Math.floor(Math.random()*(traplist.length-1))](game)
   )
 )

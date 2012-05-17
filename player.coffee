@@ -1,7 +1,14 @@
   class Player extends EventEmitter
     constructor : (@name, @role, @hp) ->
-      @_position = {}
       super()
+      @_position = {}
+      @experience = 0
+      @on('godown', ((e) ->
+        e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
+      ).bind(@))
+      @on('goup', ((e) ->
+        e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
+      ).bind(@))
 
     born : (map) ->
       nextPos = {
@@ -12,6 +19,10 @@
         @_position = nextPos
         map.reserveCell(@_position.x, @_position.y, @)
       else @born(map)
+
+    getMaxHP : ->
+      maxHP = [12, 18, 26, 36, 48, 62, 80]
+      maxHP[Math.floor(@experience)]
 
     walk : (map, direction) ->
       UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l'
@@ -31,11 +42,17 @@
       @fire('move', {position : @_position})
 
     attack : (enemy) ->
-      TEMPORARY_MAGIC_NUMBER = 2
-      enemy.hp -= TEMPORARY_MAGIC_NUMBER
+      enemy.hp -= @power || 2
+      if enemy.isDead()
+        @experience += enemy.gainExp || 0.01
+        enemy.fire('die')
+      @fire('attack', {me : @, enemy : enemy})
 
     isDead : ->
       if @hp < 1 then true else false
 
     getPosition : ->
       @_position
+
+    setPosition : (x, y) ->
+      @_position = {x : x, y : y}

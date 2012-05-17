@@ -1,14 +1,18 @@
   class Map
-    EMPTY = 0
-    PATH = 1
-    ROOM = 2
-    WALL_VERT = 3.1
-    WALL_HORIZ = 3.2
+    @EMPTY = 0
+    @PATH = 1
+    @ROOM = 2
+    @WALL_VERT = 3.1
+    @WALL_HORIZ = 3.2
+    @STAIR_UP = 4.1
+    @STAIR_DOWN = 4.2
+    @TRAP = 5
+    @ITEM = 6
 
     initMap = (width, height) ->
       map = for i in [0 ... height]
         arr = for i in [0 ... width]
-          EMPTY
+          Map.EMPTY
 
     splitMap = (map, splitMode) ->
       map = map.concat([])
@@ -26,7 +30,7 @@
         xPosition = Math.round(Math.random()*(width-10)+5)
 
         for i in [2 ... map.length-2]
-          map[i][xPosition] = PATH
+          map[i][xPosition] = Map.PATH
 
         leftHalf = []; rightHalf = []; splitColumn = []
         for row in map
@@ -44,7 +48,7 @@
         yPosition = Math.round(Math.random()*(height-10)+5)
 
         for i in [2 ... map[yPosition].length-2]
-          map[yPosition][i] = PATH
+          map[yPosition][i] = Map.PATH
 
         upperHalf = map[0 ... yPosition]
         lowerHalf = map[yPosition+1 ..]
@@ -56,33 +60,51 @@
       section = section.concat([])
       for i in [1 .. section.length-2]
         for j in [1 .. section[i].length-2]
-          if i is 1 or i is section.length-2 then section[i][j] = WALL_HORIZ
-          else if j is 1 or j is section[i].length-2 then section[i][j] = WALL_VERT
-          else section[i][j] = ROOM
+          if i is 1 or i is section.length-2 then section[i][j] = Map.WALL_HORIZ
+          else if j is 1 or j is section[i].length-2 then section[i][j] = Map.WALL_VERT
+          else section[i][j] = Map.ROOM
 
       vert_center = Math.floor(section.length / 2)
       horiz_center = Math.floor(section[0].length / 2)
 
-      section[vert_center][0] = PATH; section[vert_center][1] = ROOM
-      section[vert_center][section[vert_center].length-1] = PATH; section[vert_center][section[vert_center].length-2] = ROOM
-      section[0][horiz_center] = PATH; section[1][horiz_center] = ROOM
-      section[section.length-1][horiz_center] = PATH; section[section.length-2][horiz_center] = ROOM;
-
+      section[vert_center][0] = Map.PATH; section[vert_center][1] = Map.ROOM
+      section[vert_center][section[vert_center].length-1] = Map.PATH; section[vert_center][section[vert_center].length-2] = Map.ROOM
+      section[0][horiz_center] = Map.PATH; section[1][horiz_center] = Map.ROOM
+      section[section.length-1][horiz_center] = Map.PATH; section[section.length-2][horiz_center] = Map.ROOM;
       section
 
+    createSpecialCells = (map) ->
+      map = map.concat([])
+      f = (type, occurance = 1) ->
+        if occurance
+          x = Math.floor(Math.random()*(map[0].length-1)); y = Math.floor(Math.random()*(map.length-1))
+          if map[y][x] and map[y][x] is Map.ROOM
+            map[y][x] =  type
+            f(type, occurance -= 1)
+          else f(type, occurance)
+      f(Map.STAIR_UP)
+      f(Map.STAIR_DOWN)
+      f(Map.TRAP, Math.floor(Math.random()*10))
+      f(Map.ITEM, Math.floor(Math.random()*20+5))
+      map
+
     constructor : (@width, @height) ->
-      @_map = splitMap(initMap(@width, @height))
+      @_map = createSpecialCells(splitMap(initMap(@width, @height)))
       @reserved = []
 
     show : () ->
       str =  (for row in @_map
         (for cell in row
           switch cell
-            when EMPTY then ' '
-            when WALL_VERT then '|'
-            when WALL_HORIZ then '-'
-            when ROOM then '.'
-            when PATH then '#'
+            when Map.EMPTY then ' '
+            when Map.WALL_VERT then '|'
+            when Map.WALL_HORIZ then '-'
+            when Map.ROOM then '.'
+            when Map.TRAP then '.'
+            when Map.PATH then '#'
+            when Map.STAIR_UP then '<'
+            when Map.STAIR_DOWN then '>'
+            when Map.ITEM then '*'
             else cell
         ).join('')
       ).join('\n')
@@ -91,7 +113,8 @@
 
 
     isWalkable : (x, y) ->
-      if (@_map[y] and @_map[y][x] and [ROOM, PATH].indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
+      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.ITEM]
+      if (@_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
       else false
 
     setCell : (x, y, char) ->
