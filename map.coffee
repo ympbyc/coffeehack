@@ -77,7 +77,7 @@
       map = map.concat([])
       f = (type, occurance = 1) ->
         if occurance
-          x = Math.floor(Math.random()*(map[0].length-1)); y = Math.floor(Math.random()*(map.length-1))
+          x = Math.floor(Math.random()*map[0].length); y = Math.floor(Math.random()*map.length)
           if map[y][x] and map[y][x] is Map.ROOM
             map[y][x] =  type
             f(type, occurance -= 1)
