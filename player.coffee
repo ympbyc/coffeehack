@@ -32,7 +32,6 @@
 
     attack : (enemy) ->
       TEMPORARY_MAGIC_NUMBER = 2
-      alert(enemy.hp)
       enemy.hp -= TEMPORARY_MAGIC_NUMBER
 
     isDead : ->
