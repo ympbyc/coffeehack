@@ -84,8 +84,8 @@
           else f(type, occurance)
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
-      f(Map.TRAP, Math.floor(Math.random()*20))
-      f(Map.ITEM, Math.floor(Math.random()*30+10))
+      f(Map.TRAP, Math.floor(Math.random()*10))
+      f(Map.ITEM, Math.floor(Math.random()*20+5))
       map
 
     constructor : (@width, @height) ->

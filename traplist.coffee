@@ -1,4 +1,4 @@
-message = if require? then require('messagelist').messagelist
+message = if require? then require('messagelist').messagelist else messagelist
 
 traplist = [
     #hole
