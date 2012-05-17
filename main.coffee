@@ -23,7 +23,7 @@ window.addEventListener('load', ->
 
   game.on('turn', ->
     if (Math.random()*10 < 0.5)
-      monster = new Monster(monsterlist[Math.floor(Math.random()*(monsterlist.length-1))]...)
+      monster = new Monster(monsterlist[Math.floor(Math.random()*monsterlist.length)]...)
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
