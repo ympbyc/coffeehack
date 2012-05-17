@@ -23,12 +23,12 @@ window.addEventListener('load', ->
 
   game.on('turn', ->
     if (Math.random()*10 < 0.5)
-      monster = new Monster(monsterlist[Math.floor(Math.random()*monsterlist.length)]...)
-      monster.on('attack', ((e) ->
+      monster = new Monster(monsterlist[Math.floor(Math.random()*monsterlist.length-1)]...)
+      monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
-        @fire('message', {message : ['the', e.me.role, action, tgt+'.'].join(' ')})
-      ).bind(@))
+        game.fire('message', {message : ['the', e.me.role, action, tgt+'.'].join(' ')})
+      )
       game.addMonster(monster)
     game.moveAllMonsters()
     game.fire('turnend')
@@ -65,8 +65,15 @@ window.addEventListener('load', ->
     document.getElementById('status').innerHTML = e.status
   )
 
-  game.player.on('attack', ((e) ->
+  game.player.on('attack', (e) ->
     mode = if e.enemy.isDead() then 'You killed the ' else 'You hit the '
-      @fire('message', {message : mode + e.enemy.role + '.'})
-  ).bind(@))
+    game.fire('message', {message : mode + e.enemy.role + '.'})
+  )
+
+  game.player.on('move', (e) ->
+    if game.currentMap().getCell(e.position.x, e.position.y) is Map.TRAP
+      pp = game.player.getPosition()
+      game.currentMap().setCell(pp.x, pp.y, '^')
+      traplist[Math.floor(Math.random()*traplist.length)-1](game)
+  )
 )

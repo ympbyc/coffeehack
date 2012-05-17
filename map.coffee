@@ -75,16 +75,17 @@
 
     createSpecialCells = (map) ->
       map = map.concat([])
-      f = (type, occurance=1) ->
+      f = (type, occurance = 1) ->
         if occurance
-          x = Math.floor(Math.random()*map[0].length); y = Math.floor(Math.random()*map.length)
+          x = Math.floor(Math.random()*(map[0].length-1)); y = Math.floor(Math.random()*(map.length-1))
           if map[y][x] and map[y][x] is Map.ROOM
             map[y][x] =  type
-            f(type, occurance--)
+            f(type, occurance -= 1)
           else f(type, occurance)
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
       f(Map.TRAP, Math.floor(Math.random()*20))
+      f(Map.ITEM, Math.floor(Math.random()*30+10))
       map
 
     constructor : (@width, @height) ->
@@ -99,10 +100,11 @@
             when Map.WALL_VERT then '|'
             when Map.WALL_HORIZ then '-'
             when Map.ROOM then '.'
-            when Map.Trap then '.'
+            when Map.TRAP then '.'
             when Map.PATH then '#'
             when Map.STAIR_UP then '<'
             when Map.STAIR_DOWN then '>'
+            when Map.ITEM then '*'
             else cell
         ).join('')
       ).join('\n')
@@ -111,7 +113,8 @@
 
 
     isWalkable : (x, y) ->
-      if (@_map[y] and @_map[y][x] and [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN].indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
+      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.ITEM]
+      if (@_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
       else false
 
     setCell : (x, y, char) ->

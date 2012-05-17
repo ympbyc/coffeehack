@@ -53,3 +53,6 @@
 
     getPosition : ->
       @_position
+
+    setPosition : (x, y) ->
+      @_position = {x : x, y : y}
