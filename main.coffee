@@ -1,5 +1,6 @@
 commands =  if require? then require('commands') else window.commands
 monsterlist =  if require? then require('monsterlist') else window.monsterlist
+traplist = if require? then require('traplist') else window.traplist
 
 window.addEventListener('load', ->
   game = new Game()
@@ -71,7 +72,7 @@ window.addEventListener('load', ->
   )
 
   game.player.on('move', (e) ->
-    if game.currentMap().getCell(e.position.x, e.position.y) is Map.TRAP
+    if [Map.TRAP, Map.TRAP_ACTIVE].indexOf(game.currentMap().getCell(e.position.x, e.position.y)) > -1
       pp = game.player.getPosition()
       game.currentMap().setCell(pp.x, pp.y, Map.TRAP_ACTIVE)
       traplist[Math.floor(Math.random()*traplist.length)](game)
