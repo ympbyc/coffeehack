@@ -7,6 +7,7 @@
     @STAIR_UP = 4.1
     @STAIR_DOWN = 4.2
     @TRAP = 5
+    @TRAP_ACTIVE = 5.1
     @ITEM = 6
 
     initMap = (width, height) ->
@@ -100,7 +101,8 @@
             when Map.WALL_VERT then '|'
             when Map.WALL_HORIZ then '-'
             when Map.ROOM then '.'
-            when Map.TRAP then '.'
+            when Map.TRAP then '^'
+            when Map.TRAP_ACTIVE then '^'
             when Map.PATH then '#'
             when Map.STAIR_UP then '<'
             when Map.STAIR_DOWN then '>'
@@ -113,7 +115,7 @@
 
 
     isWalkable : (x, y) ->
-      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.ITEM]
+      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
       if (@_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
       else false
 

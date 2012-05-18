@@ -27,7 +27,7 @@ window.addEventListener('load', ->
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
-        game.fire('message', {message : ['the', e.me.role, action, tgt+'.'].join(' ')})
+        game.fire('message', {message : messagelist.format(messagelist.monster.attack, e.me.role, action, tgt)})
       )
       game.addMonster(monster)
     game.moveAllMonsters()
@@ -66,14 +66,14 @@ window.addEventListener('load', ->
   )
 
   game.player.on('attack', (e) ->
-    mode = if e.enemy.isDead() then 'You killed the ' else 'You hit the '
-    game.fire('message', {message : mode + e.enemy.role + '.'})
+    mode = if e.enemy.isDead() then 'killed' else 'hit'
+    game.fire('message', {message : messagelist.format(messagelist.player.attack, mode, e.enemy.role)})
   )
 
   game.player.on('move', (e) ->
     if game.currentMap().getCell(e.position.x, e.position.y) is Map.TRAP
       pp = game.player.getPosition()
-      game.currentMap().setCell(pp.x, pp.y, '^')
-      traplist[Math.floor(Math.random()*(traplist.length-1))](game)
+      game.currentMap().setCell(pp.x, pp.y, Map.TRAP_ACTIVE)
+      traplist[Math.floor(Math.random()*traplist.length)](game)
   )
 )
