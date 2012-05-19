@@ -1,9 +1,11 @@
 commands =  if require? then require('commands') else window.commands
 monsterlist =  if require? then require('monsterlist') else window.monsterlist
 traplist = if require? then require('traplist') else window.traplist
+ninjitsulist = if require? then require('ninjitsulist') else window.ninjitsulist
 
 MAP_WIDTH = 25
 MAP_HEIGHT = 18
+MESSAGE_SIZE = 4
 
 window.addEventListener('load', ->
   game = new Game()
@@ -14,7 +16,12 @@ window.addEventListener('load', ->
   tile = new Tile('ch-canvas')
   currentmonsterlist = (m for m in monsterlist when m[6] <= 0)
   console.log(currentmonsterlist)
-  message = ' '
+  message = [
+    '',
+    ' The following is written in a secret scroll you inherited from your ancestor.',
+    '  "There once were mean dragons crawling all around us on the ground',
+    '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."',
+    'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
   document.addEventListener('keypress', (e) ->
     keyChar = getKeyChar(e.keyCode)
@@ -51,13 +58,16 @@ window.addEventListener('load', ->
   )
 
   game.on('turnend', ->
-    document.getElementById('message').innerHTML = message
-    message = ' '
+    if message[MESSAGE_SIZE].length
+      message.shift()
+      document.getElementById('message').innerHTML = message.join('\n')
+      message.push('')
   )
 
   game.on('godown', ->
-    game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
-    game.nextMap()
+    if not game.nextMap()
+      game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
+      game.nextMap()
     game.player.born(game.currentMap())
   )
   game.on('godown', ->
@@ -72,7 +82,7 @@ window.addEventListener('load', ->
     currentmonsterlist = (m for m in monsterlist when m[6] <= game.level)
   )
   game.on('message', (e) ->
-    message += ' ' + e.message
+    message[MESSAGE_SIZE] += ' ' + e.message
   )
 
   game.on('status', (e) ->
@@ -89,6 +99,20 @@ window.addEventListener('load', ->
       pp = game.player.getPosition()
       game.currentMap().setCell(pp.x, pp.y, Map.TRAP_ACTIVE)
       traplist[Math.floor(Math.random()*traplist.length)](game)
+  )
+
+  game.player.on('move', (ev) ->
+    if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.ITEM
+      ninjitsu = ninjitsulist[Math.floor(Math.random()*ninjitsulist.length)]
+      game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. spell?"})
+      listener = (e) ->
+        document.removeEventListener('keypress', listener)
+        if getKeyChar(e.keyCode) is 'y'
+          ninjitsu.jitsu(game)
+          game.fire('message', {message : ninjitsu.message})
+          game.fire('turn')
+          game.currentMap().setCell(ev.position.x, ev.position.y, Map.ROOM)
+      document.addEventListener('keypress', listener)
   )
 
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
@@ -119,6 +143,8 @@ window.addEventListener('load', ->
             ['monster', monstermap[mapstr[ptr]]]
 
         tile.update(j, i, cell[0], cell[1])
+
+  game.fire('turn')
 )
 
 getKeyChar = (keyCode) ->
@@ -133,6 +159,8 @@ getKeyChar = (keyCode) ->
     40 : 'j',
     39 : 'l',
     37 : 'h',
-    46 : '.'
+    46 : '.',
+    121 : 'y',
+    110 : 'n'
   }
   keyChar[keyCode]

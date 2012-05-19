@@ -34,7 +34,7 @@ ninjitsulist = [
     name : 'jitsu of level teleport',
     jitsu : ((game) ->
       tolevel = Math.floor(Math.random() * game.level)
-      if tolevel isnt game.level then game.fire('goup') for i in [game.level .. tolevel]
+      if tolevel isnt game.level then game.fire('goup') for i in [game.level ... tolevel]
     ),
     description : 'Go back up to a random floor level',
     message : 'Some magical power pulled your pants up.'

@@ -14,12 +14,6 @@ traplist = [
     game.fire('message', {message : message.trap.teleport})
     pp = game.player.getPosition()
     map = game.currentMap()
-    (f = ->
-      x = Math.floor(Math.random()*map.width); y = Math.floor(Math.random()*map.height)
-      if map.isWalkable(x, y)
-        map.clearReservation(pp.x, pp.y)
-        map.reserveCell(x, y)
-        game.player.setPosition(x, y)
-      else f()
-    )()
+    map.clearReservation(pp.x, pp.y)
+    game.player.born(map)
 ]
