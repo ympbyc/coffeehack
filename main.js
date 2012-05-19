@@ -9,9 +9,9 @@ traplist = typeof require !== "undefined" && require !== null ? require('traplis
 
 ninjitsulist = typeof require !== "undefined" && require !== null ? require('ninjitsulist') : window.ninjitsulist;
 
-MAP_WIDTH = 25;
+MAP_WIDTH = 40;
 
-MAP_HEIGHT = 18;
+MAP_HEIGHT = 30;
 
 MESSAGE_SIZE = 4;
 
@@ -153,7 +153,7 @@ window.addEventListener('load', function() {
     if (game.currentMap().getCell(ev.position.x, ev.position.y) === Map.ITEM) {
       ninjitsu = ninjitsulist[Math.floor(Math.random() * ninjitsulist.length)];
       game.fire('message', {
-        message: "" + ninjitsu.name + " : " + ninjitsu.description + ". spell?"
+        message: "" + ninjitsu.name + " : " + ninjitsu.description + ". spell? (y or anything else)"
       });
       listener = function(e) {
         document.removeEventListener('keypress', listener);

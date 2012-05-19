@@ -11,7 +11,7 @@ class Tile
   @images = (->
     {
       map : {
-        blank : loadImage(861),
+        blank : loadImage(829),
         room : loadImage(849),
         path : loadImage(850),
         wall_vert : loadImage(830),
