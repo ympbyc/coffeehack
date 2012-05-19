@@ -1,6 +1,7 @@
 commands =  if require? then require('commands') else window.commands
 monsterlist =  if require? then require('monsterlist') else window.monsterlist
 traplist = if require? then require('traplist') else window.traplist
+ninjitsulist = if require? then require('ninjitsulist') else window.ninjitsulist
 
 MAP_WIDTH = 25
 MAP_HEIGHT = 18
@@ -64,8 +65,9 @@ window.addEventListener('load', ->
   )
 
   game.on('godown', ->
-    game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
-    game.nextMap()
+    if not game.nextMap()
+      game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
+      game.nextMap()
     game.player.born(game.currentMap())
   )
   game.on('godown', ->
@@ -99,8 +101,18 @@ window.addEventListener('load', ->
       traplist[Math.floor(Math.random()*traplist.length)](game)
   )
 
-  game.player.on('move', (e) ->
-
+  game.player.on('move', (ev) ->
+    if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.ITEM
+      ninjitsu = ninjitsulist[Math.floor(Math.random()*ninjitsulist.length)]
+      game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. spell?"})
+      listener = (e) ->
+        document.removeEventListener('keypress', listener)
+        if getKeyChar(e.keyCode) is 'y'
+          ninjitsu.jitsu(game)
+          game.fire('message', {message : ninjitsu.message})
+          game.fire('turn')
+          game.currentMap().setCell(ev.position.x, ev.position.y, Map.ROOM)
+      document.addEventListener('keypress', listener)
   )
 
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
@@ -147,6 +159,8 @@ getKeyChar = (keyCode) ->
     40 : 'j',
     39 : 'l',
     37 : 'h',
-    46 : '.'
+    46 : '.',
+    121 : 'y',
+    110 : 'n'
   }
   keyChar[keyCode]

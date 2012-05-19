@@ -86,7 +86,7 @@
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
       f(Map.TRAP, Math.floor(Math.random()*10))
-      f(Map.ITEM, Math.floor(Math.random()*20+5))
+      f(Map.ITEM, Math.floor(Math.random()*10+3))
       map
 
     constructor : (@width, @height) ->
@@ -101,7 +101,7 @@
             when Map.WALL_VERT then '|'
             when Map.WALL_HORIZ then '-'
             when Map.ROOM then '.'
-            when Map.TRAP then '^'
+            when Map.TRAP then '.'
             when Map.TRAP_ACTIVE then '^'
             when Map.PATH then '#'
             when Map.STAIR_UP then '<'

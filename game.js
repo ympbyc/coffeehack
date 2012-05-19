@@ -34,6 +34,9 @@ Game = (function(_super) {
   };
 
   Game.prototype.nextMap = function() {
+    if (!(this.mapStack[this.level + 1] != null)) {
+      return false;
+    }
     this.player.fire('godown', {
       prevMap: this.currentMap()
     });

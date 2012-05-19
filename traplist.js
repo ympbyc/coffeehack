@@ -15,23 +15,13 @@ traplist = [
     });
     return game.player.hp -= 4;
   }, function(game) {
-    var f, map, pp;
+    var map, pp;
     game.fire('message', {
       message: message.trap.teleport
     });
     pp = game.player.getPosition();
     map = game.currentMap();
-    return (f = function() {
-      var x, y;
-      x = Math.floor(Math.random() * map.width);
-      y = Math.floor(Math.random() * map.height);
-      if (map.isWalkable(x, y)) {
-        map.clearReservation(pp.x, pp.y);
-        map.reserveCell(x, y);
-        return game.player.setPosition(x, y);
-      } else {
-        return f();
-      }
-    })();
+    map.clearReservation(pp.x, pp.y);
+    return game.player.born(map);
   }
 ];

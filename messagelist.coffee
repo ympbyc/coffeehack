@@ -17,5 +17,5 @@ messagelist.player = {
 }
 
 messagelist.monster = {
-  attack : "the ? ?.",
+  attack : "the ? ? ?.",
 }

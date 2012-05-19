@@ -21,6 +21,7 @@
       @mapStack[@level]
 
     nextMap : ->
+      if not @mapStack[@level+1]? then return false
       @player.fire('godown', {prevMap : @currentMap()})
       @level++
       @levelInit()
