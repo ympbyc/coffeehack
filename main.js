@@ -33,7 +33,7 @@ window.addEventListener('load', function() {
     return _results;
   })();
   console.log(currentmonsterlist);
-  message = ['', ' The following is written in a secret scroll you inherited from your ancister.', '  "There once were mean dragons crawling all around us on the ground', '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."', 'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!'];
+  message = ['', ' The following is written in a secret scroll you inherited from your ancestor.', '  "There once were mean dragons crawling all around us on the ground', '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."', 'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!'];
   document.addEventListener('keypress', function(e) {
     var direction, keyChar;
     keyChar = getKeyChar(e.keyCode);
