@@ -4,6 +4,7 @@ traplist = if require? then require('traplist') else window.traplist
 
 MAP_WIDTH = 25
 MAP_HEIGHT = 18
+MESSAGE_SIZE = 4
 
 window.addEventListener('load', ->
   game = new Game()
@@ -14,7 +15,12 @@ window.addEventListener('load', ->
   tile = new Tile('ch-canvas')
   currentmonsterlist = (m for m in monsterlist when m[6] <= 0)
   console.log(currentmonsterlist)
-  message = ' '
+  message = [
+    '',
+    ' The following is written in a secret scroll you inherited from your ancister.',
+    '  "There once were mean dragons crawling all around us on the ground',
+    '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."',
+    'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
   document.addEventListener('keypress', (e) ->
     keyChar = getKeyChar(e.keyCode)
@@ -51,8 +57,10 @@ window.addEventListener('load', ->
   )
 
   game.on('turnend', ->
-    document.getElementById('message').innerHTML = message
-    message = ' '
+    if message[MESSAGE_SIZE].length
+      message.shift()
+      document.getElementById('message').innerHTML = message.join('\n')
+      message.push('')
   )
 
   game.on('godown', ->
@@ -72,7 +80,7 @@ window.addEventListener('load', ->
     currentmonsterlist = (m for m in monsterlist when m[6] <= game.level)
   )
   game.on('message', (e) ->
-    message += ' ' + e.message
+    message[MESSAGE_SIZE] += ' ' + e.message
   )
 
   game.on('status', (e) ->
