@@ -99,6 +99,10 @@ window.addEventListener('load', ->
       traplist[Math.floor(Math.random()*traplist.length)](game)
   )
 
+  game.player.on('move', (e) ->
+
+  )
+
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
     '0').join('')
   monstermap = {}
@@ -127,6 +131,8 @@ window.addEventListener('load', ->
             ['monster', monstermap[mapstr[ptr]]]
 
         tile.update(j, i, cell[0], cell[1])
+
+  game.fire('turn')
 )
 
 getKeyChar = (keyCode) ->

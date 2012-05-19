@@ -144,6 +144,7 @@ window.addEventListener('load', function() {
       return traplist[Math.floor(Math.random() * traplist.length)](game);
     }
   });
+  game.player.on('move', function(e) {});
   prevmapstr = ((function() {
     var _i, _ref, _results;
     _results = [];
@@ -157,7 +158,7 @@ window.addEventListener('load', function() {
     m = monsterlist[_i];
     monstermap[m[2]] = m[0];
   }
-  return updateCanvas = function(mapstr) {
+  updateCanvas = function(mapstr) {
     var cell, j, ptr, _j, _results;
     mapstr = mapstr.replace(/\n/g, '');
     ptr = -1;
@@ -204,6 +205,7 @@ window.addEventListener('load', function() {
     }
     return _results;
   };
+  return game.fire('turn');
 });
 
 getKeyChar = function(keyCode) {
