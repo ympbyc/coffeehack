@@ -49,13 +49,14 @@
     countMonster : ->
       ctr = 0
       for m in @monsterStack[@level]
-        if m then ctr++
+        if m? then ctr++
       ctr
 
     moveAllMonsters : ->
+      pp = @player.getPosition()
       for m in @monsterStack[@level]
         if m
-          m.move(@currentMap())
+          m.move(@currentMap(), pp.x, pp.y)
           m.fire('move')
 
     turnInit : ->

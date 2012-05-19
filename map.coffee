@@ -19,8 +19,8 @@
       map = map.concat([])
       height = map.length
       width = map[0].length
-      SPLIT_VERTICAL = 0
-      SPLIT_HORIZONTAL = 1
+      SPLIT_VERTICAL = 1
+      SPLIT_HORIZONTAL = 2
       MINIMUM_LENGTH = 12
 
       return createRoom(map) if width < MINIMUM_LENGTH or height < MINIMUM_LENGTH
@@ -90,7 +90,7 @@
       map
 
     constructor : (@width, @height) ->
-      @_map = createSpecialCells(splitMap(initMap(@width, @height)))
+      @_map = createSpecialCells(splitMap(initMap(@width, @height), 1))
       @reserved = []
 
     show : () ->
@@ -112,7 +112,6 @@
       ).join('\n')
       console.log(str)
       str
-
 
     isWalkable : (x, y) ->
       walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
