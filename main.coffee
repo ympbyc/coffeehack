@@ -12,7 +12,8 @@ window.addEventListener('load', ->
   game.nextMap()
   game.player.born(game.currentMap())
   tile = new Tile('ch-canvas')
-
+  currentmonsterlist = (m for m in monsterlist when m[6] <= 0)
+  console.log(currentmonsterlist)
   message = ' '
 
   document.addEventListener('keypress', (e) ->
@@ -29,7 +30,7 @@ window.addEventListener('load', ->
 
   game.on('turn', ->
     if (Math.random()*10 < 0.2 and game.countMonster() < 10)
-      monster = new Monster(monsterlist[Math.floor(Math.random()*monsterlist.length)]...)
+      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...)
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
@@ -59,11 +60,17 @@ window.addEventListener('load', ->
     game.nextMap()
     game.player.born(game.currentMap())
   )
+  game.on('godown', ->
+    currentmonsterlist = (m for m in monsterlist when m[6] <= game.level)
+    console.log(currentmonsterlist)
+  )
   game.on('goup', ->
     game.prevMap()
     game.player.born(game.currentMap())
   )
-
+  game.on('goup', ->
+    currentmonsterlist = (m for m in monsterlist when m[6] <= game.level)
+  )
   game.on('message', (e) ->
     message += ' ' + e.message
   )

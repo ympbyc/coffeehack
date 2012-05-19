@@ -21,8 +21,12 @@
       else @born(map)
 
     getMaxHP : ->
-      maxHP = [12, 18, 26, 36, 48, 62, 80]
-      maxHP[Math.floor(@experience)]
+      maxHP = [12, 18, 26, 36, 48, 62, 80, 100]
+      maxHP[Math.floor(@experience)] || maxHP[maxHP.length-1]
+
+    getPower : ->
+      power = (i for i in [4..20] by 2)
+      power[Math.floor(@experience)] || power[power.length-1]
 
     walk : (map, direction) ->
       UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l'
@@ -42,7 +46,7 @@
       @fire('move', {position : @_position})
 
     attack : (enemy) ->
-      enemy.hp -= @power || 2
+      enemy.hp -= @getPower()
       if enemy.isDead()
         @experience += enemy.gainExp || 0.01
         enemy.fire('die')

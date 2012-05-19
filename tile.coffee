@@ -28,6 +28,9 @@ class Tile
         'grid bug' : loadImage(117),
         newt : loadImage(326),
         jackal : loadImage(12),
+        gnome : loadImage(166),
+        dwarf : loadImage(45),
+        rothe : loadImage(82),
         dragon : loadImage(147)
       },
     }

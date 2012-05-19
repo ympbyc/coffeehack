@@ -1,5 +1,5 @@
   class Monster extends Player
-    constructor : (@role, @hp, @char, @power, @gainExp, @action) ->
+    constructor : (@role, @hp, @char, @power, @gainExp, @action, devnull) ->
       super(null, @role, @hp)
 
     move : (map, x, y) ->

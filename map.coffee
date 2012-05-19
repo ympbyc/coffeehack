@@ -110,7 +110,6 @@
             else cell
         ).join('')
       ).join('\n')
-      console.log(str)
       str
 
     isWalkable : (x, y) ->
