@@ -57,7 +57,7 @@ ninjitsulist = [
       tolevel = Math.floor(Math.random() * game.level);
       if (tolevel !== game.level) {
         _results = [];
-        for (i = _i = _ref = game.level; _ref <= tolevel ? _i <= tolevel : _i >= tolevel; i = _ref <= tolevel ? ++_i : --_i) {
+        for (i = _i = _ref = game.level; _ref <= tolevel ? _i < tolevel : _i > tolevel; i = _ref <= tolevel ? ++_i : --_i) {
           _results.push(game.fire('goup'));
         }
         return _results;

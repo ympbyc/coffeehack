@@ -141,7 +141,7 @@ Map = (function() {
     f(Map.STAIR_UP);
     f(Map.STAIR_DOWN);
     f(Map.TRAP, Math.floor(Math.random() * 10));
-    f(Map.ITEM, Math.floor(Math.random() * 20 + 5));
+    f(Map.ITEM, Math.floor(Math.random() * 10 + 3));
     return map;
   };
 
@@ -179,7 +179,7 @@ Map = (function() {
                 _results1.push('.');
                 break;
               case Map.TRAP:
-                _results1.push('^');
+                _results1.push('.');
                 break;
               case Map.TRAP_ACTIVE:
                 _results1.push('^');
