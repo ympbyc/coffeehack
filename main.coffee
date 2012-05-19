@@ -164,3 +164,18 @@ getKeyChar = (keyCode) ->
     110 : 'n'
   }
   keyChar[keyCode]
+
+
+unless Function::bind
+  Function::bind = (oThis) ->
+    throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable")  if typeof this isnt "function"
+    aArgs = Array::slice.call(arguments, 1)
+    fToBind = this
+    fNOP = ->
+
+    fBound = ->
+      fToBind.apply (if this instanceof fNOP then this else oThis or window), aArgs.concat(Array::slice.call(arguments))
+
+    fNOP:: = @::
+    fBound:: = new fNOP()
+    fBound
