@@ -13,10 +13,10 @@
         else
           mp = @getPosition()
           direction = (
-            if mp.x < x and map.isWalkable(mp.x+1, mp.y) then 'r'
-            else if mp.x > x and map.isWalkable(mp.x-1, mp.y) then 'l'
-            else if mp.y < y and map.isWalkable(mp.x, mp.y+1) then 'd'
-            else if mp.y > y and map.isWalkable(mp.x, mp.y-1) then 'u'
+            if mp.x < x and map.isAttackable(mp.x+1, mp.y) then 'r'
+            else if mp.x > x and map.isAttackable(mp.x-1, mp.y) then 'l'
+            else if mp.y < y and map.isAttackable(mp.x, mp.y+1) then 'd'
+            else if mp.y > y and map.isAttackable(mp.x, mp.y-1) then 'u'
             else false)
           if direction then @walk(map, direction)
           else fallback()

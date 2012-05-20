@@ -112,10 +112,13 @@
       ).join('\n')
       str
 
+    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
+
     isWalkable : (x, y) ->
-      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
-      if (@_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
-      else false
+      @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)
+
+    isAttackable : (x, y) ->
+      @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1
 
     setCell : (x, y, char) ->
       @_map[y][x] = char
