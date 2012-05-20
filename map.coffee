@@ -58,6 +58,7 @@
         return splitMap(upperHalf, SPLIT_VERTICAL).concat splitRow.concat splitMap(lowerHalf, SPLIT_VERTICAL)
 
     createRoom = (section) ->
+      return section if section.length < 5 or section[0].length < 5
       section = section.concat([])
       for i in [1 .. section.length-2]
         for j in [1 .. section[i].length-2]
@@ -112,10 +113,13 @@
       ).join('\n')
       str
 
+    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
+
     isWalkable : (x, y) ->
-      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
-      if (@_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
-      else false
+      @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)
+
+    isAttackable : (x, y) ->
+      @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1
 
     setCell : (x, y, char) ->
       @_map[y][x] = char
