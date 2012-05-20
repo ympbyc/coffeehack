@@ -49,7 +49,7 @@ window.addEventListener('load', ->
   )
 
   game.on('turnend', ->
-    document.getElementById('jshack').innerHTML = game.drawStage()
+    #document.getElementById('jshack').innerHTML = game.drawStage()
     updateCanvas(game.drawStage())
     status = [game.player.name, '@ level', game.level, '\n',
       'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time

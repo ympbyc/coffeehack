@@ -46,9 +46,10 @@
       @fire('move', {position : @_position})
 
     attack : (enemy) ->
+      return if @isDead()
       enemy.hp -= @getPower()
       if enemy.isDead()
-        @experience += enemy.gainExp || 0.01
+        @experience += enemy.gainExp/(@experience || 1) #gain Exp decreases according to the players exp
         enemy.fire('die')
       @fire('attack', {me : @, enemy : enemy})
 
