@@ -36,7 +36,7 @@ window.addEventListener('load', ->
   )
 
   game.on('turn', ->
-    if (Math.random()*10 < 0.2 and game.countMonster() < 10)
+    if (Math.random()*10 < 0.5 and game.countMonster() < 10)
       monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...)
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
