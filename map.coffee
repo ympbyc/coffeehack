@@ -58,6 +58,7 @@
         return splitMap(upperHalf, SPLIT_VERTICAL).concat splitRow.concat splitMap(lowerHalf, SPLIT_VERTICAL)
 
     createRoom = (section) ->
+      return section if section.length < 5 or section[0].length < 5
       section = section.concat([])
       for i in [1 .. section.length-2]
         for j in [1 .. section[i].length-2]
