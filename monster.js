@@ -31,7 +31,7 @@ Monster = (function(_super) {
         return fallback();
       } else {
         mp = this.getPosition();
-        direction = (mp.x < x && map.isWalkable(mp.x + 1, mp.y) ? 'r' : mp.x > x && map.isWalkable(mp.x - 1, mp.y) ? 'l' : mp.y < y && map.isWalkable(mp.x, mp.y + 1) ? 'd' : mp.y > y && map.isWalkable(mp.x, mp.y - 1) ? 'u' : false);
+        direction = (mp.x < x && map.isAttackable(mp.x + 1, mp.y) ? 'r' : mp.x > x && map.isAttackable(mp.x - 1, mp.y) ? 'l' : mp.y < y && map.isAttackable(mp.x, mp.y + 1) ? 'd' : mp.y > y && map.isAttackable(mp.x, mp.y - 1) ? 'u' : false);
         if (direction) {
           return this.walk(map, direction);
         } else {

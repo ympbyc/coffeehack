@@ -2,7 +2,7 @@
 var Map;
 
 Map = (function() {
-  var createRoom, createSpecialCells, initMap, splitMap;
+  var createRoom, createSpecialCells, initMap, splitMap, walkable;
 
   Map.EMPTY = 0;
 
@@ -94,6 +94,9 @@ Map = (function() {
 
   createRoom = function(section) {
     var horiz_center, i, j, vert_center, _i, _j, _ref, _ref1;
+    if (section.length < 5 || section[0].length < 5) {
+      return section;
+    }
     section = section.concat([]);
     for (i = _i = 1, _ref = section.length - 2; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
       for (j = _j = 1, _ref1 = section[i].length - 2; 1 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 1 <= _ref1 ? ++_j : --_j) {
@@ -208,14 +211,14 @@ Map = (function() {
     return str;
   };
 
+  walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM];
+
   Map.prototype.isWalkable = function(x, y) {
-    var walkable;
-    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM];
-    if (this._map[y] && this._map[y][x] && walkable.indexOf(this._map[y][x]) > -1 && !this.getReservation(x, y)) {
-      return true;
-    } else {
-      return false;
-    }
+    return this._map[y] && this._map[y][x] && walkable.indexOf(this._map[y][x]) > -1 && !this.getReservation(x, y);
+  };
+
+  Map.prototype.isAttackable = function(x, y) {
+    return this._map[y] && this._map[y][x] && walkable.indexOf(this._map[y][x]) > -1;
   };
 
   Map.prototype.setCell = function(x, y, char) {
