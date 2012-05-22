@@ -7,14 +7,15 @@ Monster = (function(_super) {
 
   __extends(Monster, _super);
 
-  function Monster(role, hp, char, power, gainExp, action, devnull) {
+  function Monster(role, difficulty, char, explevel, gainExp, action, dice) {
     this.role = role;
-    this.hp = hp;
+    this.difficulty = difficulty;
     this.char = char;
-    this.power = power;
+    this.explevel = explevel;
     this.gainExp = gainExp;
     this.action = action;
-    Monster.__super__.constructor.call(this, null, this.role, this.hp);
+    this.dice = dice;
+    Monster.__super__.constructor.call(this, null, this.role, utils.dice(this.explevel, 8), this.explevel, this.gainExp, this.dice);
   }
 
   Monster.prototype.move = function(map, x, y) {

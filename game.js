@@ -113,7 +113,7 @@ Game = (function(_super) {
   Game.prototype.turnInit = function() {
     this.time++;
     if (this.player.hp < this.player.getMaxHP()) {
-      return this.player.hp += 0.2;
+      return this.player.hp += 1 / ((42 / (this.player.explevel + 2)) + 1);
     }
   };
 
