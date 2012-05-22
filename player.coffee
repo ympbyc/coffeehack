@@ -5,7 +5,11 @@
       100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000
     ]
 
-
+    ###
+    # experience is an floating point number, incremented each time the player defeats a monster
+    # explevel is an integer number, incremente when the player reachs the required experience
+    # gainExp is the experience given to the enemy when
+    ###
     constructor : (@name, @role, @hp, @explevel=0, @gainExp=0, @dice=[1,4]) ->
       super()
       @_position = {}

@@ -1,7 +1,7 @@
   class Game extends EventEmitter
     constructor : ->
       super()
-      @monsterStack = [[]]
+      @monsterStack = [[]] #y-axis holds floor levels
       @mapStack = []
       @level = -1
       @time = 0
@@ -62,7 +62,7 @@
 
     turnInit : ->
       @time++
-      @player.hp += 1 / ((42 / (@player.explevel + 2)) + 1) if @player.hp < @player.getMaxHP()
+      @player.hp += 1 / ((42 / (@player.explevel + 2)) + 1) if @player.hp < @player.getMaxHP() #NETHACK LOGIC
 
     turnEnd : ->
       @killMonsters()

@@ -1,6 +1,7 @@
   class Monster extends Player
     constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
-      super(null, @role, utils.dice(@explevel, 8), @explevel, @gainExp, @dice)
+      hp = utils.dice(@explevel, 8) #NETHACK LOGIC
+      super(null, @role, hp, @explevel, @gainExp, @dice)
 
     move : (map, x, y) ->
       fallback = (->
@@ -9,7 +10,7 @@
       if not x? or not y?
         fallback()
       else
-        if Math.floor(Math.random()*10) < 3 then fallback()
+        if Math.floor(Math.random()*10) < 2 then fallback()
         else
           mp = @getPosition()
           direction = (

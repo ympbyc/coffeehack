@@ -3,17 +3,18 @@ monsterlist =  if require? then require('monsterlist') else window.monsterlist
 traplist = if require? then require('traplist') else window.traplist
 ninjitsulist = if require? then require('ninjitsulist') else window.ninjitsulist
 
-MAP_WIDTH = 40 #25
-MAP_HEIGHT = 30 #18
-MESSAGE_SIZE = 4
+MAP_WIDTH = 40
+MAP_HEIGHT = 30
+MAX_MONSTER = 10 #maximum number of monsters that can exist on the map
+MESSAGE_SIZE = 4 #number of massages to save
 
 window.addEventListener('load', ->
   game = new Game()
-  game.setPlayer(new Player('ympbyc', 'Samurai', 12))
+  game.setPlayer(new Player('coffeedrinker', 'Ninja', 12))
   game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
   game.nextMap()
   game.player.born(game.currentMap())
-  tile = new Tile('ch-canvas')
+  tile = new Tile('ch-canvas') #set up the canvas element
   currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
   message = [
     '',
@@ -23,7 +24,7 @@ window.addEventListener('load', ->
     'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
   document.addEventListener('keypress', (e) ->
-    keyChar = getKeyChar(e.keyCode)
+    keyChar = getKeyChar(e.keyCode) #middleware wraps the keycode difference in each browser
     direction = {'k' : 'u', 'j' : 'd', 'l' : 'r',  'h' : 'l'} #kjlh
     if direction[keyChar]
       game.player.walk(game.currentMap(),  direction[keyChar])
@@ -35,9 +36,8 @@ window.addEventListener('load', ->
   )
 
   game.on('turn', ->
-    if (Math.random()*10 < 0.5 and game.countMonster() < 10)
-      monster = new Monster(currentmonsterlist[a = Math.floor(Math.random()*currentmonsterlist.length)]...)
-      console.log(a)
+    if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
+      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...)
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
@@ -49,12 +49,12 @@ window.addEventListener('load', ->
   )
 
   game.on('turnend', ->
-    #document.getElementById('jshack').innerHTML = game.drawStage()
-    updateCanvas(game.drawStage())
+    #document.getElementById('jshack').innerHTML = game.drawStage() #activate when you want the text-mode
+    updateCanvas(game.drawStage()) #draw the current map on the canvas
     status = [game.player.name, '@ floor -', game.level, '\n',
       'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time
     ].join(' ')
-    game.fire('status', {status : status})
+    game.fire('status', {status : status}) #writes out the status line at the botttom
   )
 
   game.on('turnend', ->
@@ -65,13 +65,13 @@ window.addEventListener('load', ->
   )
 
   game.on('godown', ->
-    if not game.nextMap()
+    if not game.nextMap() #false when there is no map deeper than the current
       game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
       game.nextMap()
     game.player.born(game.currentMap())
   )
   game.on('godown', ->
-    currentmonsterlist = (m for m in monsterlist when m[1] <= (((game.player.explevel or 1) + game.level)/2))
+    currentmonsterlist = (m for m in monsterlist when m[1] <= (((game.player.explevel or 1) + game.level)/2)) #NETHACK LOGIC
     console.log(currentmonsterlist)
   )
   game.on('goup', ->
@@ -79,7 +79,7 @@ window.addEventListener('load', ->
     game.player.born(game.currentMap())
   )
   game.on('goup', ->
-    currentmonsterlist = (m for m in monsterlist when m[1] <= ((game.player.explevel + game.level)/2 or 1))
+    currentmonsterlist = (m for m in monsterlist when m[1] <= ((game.player.explevel + game.level)/2 or 1)) #NETHACK LOGIC
   )
   game.on('message', (e) ->
     message[MESSAGE_SIZE] += ' ' + e.message
@@ -98,12 +98,12 @@ window.addEventListener('load', ->
     if [Map.TRAP, Map.TRAP_ACTIVE].indexOf(game.currentMap().getCell(e.position.x, e.position.y)) > -1
       pp = game.player.getPosition()
       game.currentMap().setCell(pp.x, pp.y, Map.TRAP_ACTIVE)
-      traplist[Math.floor(Math.random()*traplist.length)](game)
+      traplist[Math.floor(Math.random()*traplist.length)](game) #trap type is decided randomly on the fly
   )
 
   game.player.on('move', (ev) ->
     if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.ITEM
-      ninjitsu = ninjitsulist[Math.floor(Math.random()*ninjitsulist.length)]
+      ninjitsu = ninjitsulist[Math.floor(Math.random()*ninjitsulist.length)] #ninjutsus, too decided randomly
       game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. spell? (y or anything else)"})
       listener = (e) ->
         document.removeEventListener('keypress', listener)
