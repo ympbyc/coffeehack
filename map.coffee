@@ -7,6 +7,7 @@
     @STAIR_UP = 4.1
     @STAIR_DOWN = 4.2
     @TRAP = 5
+    @TRAP_ACTIVE = 5.1
     @ITEM = 6
 
     initMap = (width, height) ->
@@ -18,8 +19,8 @@
       map = map.concat([])
       height = map.length
       width = map[0].length
-      SPLIT_VERTICAL = 0
-      SPLIT_HORIZONTAL = 1
+      SPLIT_VERTICAL = 1
+      SPLIT_HORIZONTAL = 2
       MINIMUM_LENGTH = 12
 
       return createRoom(map) if width < MINIMUM_LENGTH or height < MINIMUM_LENGTH
@@ -57,6 +58,7 @@
         return splitMap(upperHalf, SPLIT_VERTICAL).concat splitRow.concat splitMap(lowerHalf, SPLIT_VERTICAL)
 
     createRoom = (section) ->
+      return section if section.length < 5 or section[0].length < 5
       section = section.concat([])
       for i in [1 .. section.length-2]
         for j in [1 .. section[i].length-2]
@@ -77,7 +79,7 @@
       map = map.concat([])
       f = (type, occurance = 1) ->
         if occurance
-          x = Math.floor(Math.random()*(map[0].length-1)); y = Math.floor(Math.random()*(map.length-1))
+          x = Math.floor(Math.random()*map[0].length); y = Math.floor(Math.random()*map.length)
           if map[y][x] and map[y][x] is Map.ROOM
             map[y][x] =  type
             f(type, occurance -= 1)
@@ -85,11 +87,11 @@
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
       f(Map.TRAP, Math.floor(Math.random()*10))
-      f(Map.ITEM, Math.floor(Math.random()*20+5))
+      f(Map.ITEM, Math.floor(Math.random()*10+3))
       map
 
     constructor : (@width, @height) ->
-      @_map = createSpecialCells(splitMap(initMap(@width, @height)))
+      @_map = createSpecialCells(splitMap(initMap(@width, @height), 1))
       @reserved = []
 
     show : () ->
@@ -101,6 +103,7 @@
             when Map.WALL_HORIZ then '-'
             when Map.ROOM then '.'
             when Map.TRAP then '.'
+            when Map.TRAP_ACTIVE then '^'
             when Map.PATH then '#'
             when Map.STAIR_UP then '<'
             when Map.STAIR_DOWN then '>'
@@ -108,14 +111,15 @@
             else cell
         ).join('')
       ).join('\n')
-      console.log(str)
       str
 
+    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
 
     isWalkable : (x, y) ->
-      walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.ITEM]
-      if (@_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)) then true
-      else false
+      @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)
+
+    isAttackable : (x, y) ->
+      @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1
 
     setCell : (x, y, char) ->
       @_map[y][x] = char
