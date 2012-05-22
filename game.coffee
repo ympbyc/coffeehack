@@ -62,7 +62,7 @@
 
     turnInit : ->
       @time++
-      @player.hp += 0.2 if @player.hp < @player.getMaxHP()
+      @player.hp += 1 / ((42 / (@player.explevel + 2)) + 1) if @player.hp < @player.getMaxHP()
 
     turnEnd : ->
       @killMonsters()
