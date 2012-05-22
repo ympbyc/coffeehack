@@ -1,5 +1,12 @@
   class Player extends EventEmitter
-    constructor : (@name, @role, @hp) ->
+    @EXP_REQUIRED = [
+      0, 20, 40, 80, 160, 320, 640, 1280, 2560, 5120,
+      10000, 20000, 40000, 80000, 160000, 320000, 640000, 1280000, 2560000, 5120000,
+      100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000
+    ]
+
+
+    constructor : (@name, @role, @hp, @explevel=0, @gainExp=0, @dice=[1,4]) ->
       super()
       @_position = {}
       @experience = 0
@@ -22,11 +29,7 @@
 
     getMaxHP : ->
       maxHP = [12, 18, 26, 36, 48, 62, 80, 100]
-      maxHP[Math.floor(@experience)] || maxHP[maxHP.length-1]
-
-    getPower : ->
-      power = (i for i in [4..20] by 2)
-      power[Math.floor(@experience)] || power[power.length-1]
+      maxHP[@explevel] || maxHP[maxHP.length-1]
 
     walk : (map, direction) ->
       UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l'
@@ -47,11 +50,18 @@
 
     attack : (enemy) ->
       return if @isDead()
-      enemy.hp -= @getPower()
+      enemy.hp -= utils.dice(@dice[0], @dice[1])
       if enemy.isDead()
-        @experience += enemy.gainExp/(@experience || 1) #gain Exp decreases according to the players exp
+        @killedAnEnemy(enemy)
         enemy.fire('die')
       @fire('attack', {me : @, enemy : enemy})
+
+    killedAnEnemy : (enemy) ->
+      @experience += enemy.gainExp
+      if @experience >= Player.EXP_REQUIRED[@explevel+1]
+        @explevel += 1
+        @dice[1] += 1
+        @fire('explevelup', {explevel : @explevel})
 
     isDead : ->
       if @hp < 1 then true else false

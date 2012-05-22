@@ -14,8 +14,7 @@ window.addEventListener('load', ->
   game.nextMap()
   game.player.born(game.currentMap())
   tile = new Tile('ch-canvas')
-  currentmonsterlist = (m for m in monsterlist when m[6] <= 0)
-  console.log(currentmonsterlist)
+  currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
   message = [
     '',
     ' The following is written in a secret scroll you inherited from your ancestor.',
@@ -37,7 +36,8 @@ window.addEventListener('load', ->
 
   game.on('turn', ->
     if (Math.random()*10 < 0.5 and game.countMonster() < 10)
-      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...)
+      monster = new Monster(currentmonsterlist[a = Math.floor(Math.random()*currentmonsterlist.length)]...)
+      console.log(a)
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
@@ -51,7 +51,7 @@ window.addEventListener('load', ->
   game.on('turnend', ->
     #document.getElementById('jshack').innerHTML = game.drawStage()
     updateCanvas(game.drawStage())
-    status = [game.player.name, '@ level', game.level, '\n',
+    status = [game.player.name, '@ floor -', game.level, '\n',
       'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time
     ].join(' ')
     game.fire('status', {status : status})
@@ -71,7 +71,7 @@ window.addEventListener('load', ->
     game.player.born(game.currentMap())
   )
   game.on('godown', ->
-    currentmonsterlist = (m for m in monsterlist when m[6] <= game.level)
+    currentmonsterlist = (m for m in monsterlist when m[1] <= (((game.player.explevel or 1) + game.level)/2))
     console.log(currentmonsterlist)
   )
   game.on('goup', ->
@@ -79,7 +79,7 @@ window.addEventListener('load', ->
     game.player.born(game.currentMap())
   )
   game.on('goup', ->
-    currentmonsterlist = (m for m in monsterlist when m[6] <= game.level)
+    currentmonsterlist = (m for m in monsterlist when m[1] <= ((game.player.explevel + game.level)/2 or 1))
   )
   game.on('message', (e) ->
     message[MESSAGE_SIZE] += ' ' + e.message
@@ -113,6 +113,9 @@ window.addEventListener('load', ->
           game.fire('turn')
           game.currentMap().setCell(ev.position.x, ev.position.y, Map.ROOM)
       document.addEventListener('keypress', listener)
+  )
+  game.player.on('explevelup', (e) ->
+    game.fire('message', {message : "Welcome to experience level #{e.explevel}."})
   )
 
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
