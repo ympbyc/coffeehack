@@ -1,3 +1,5 @@
+# dependencie - eventemitter.coffee
+
   class Game extends EventEmitter
     constructor : ->
       super()

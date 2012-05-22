@@ -1,3 +1,5 @@
+# dependencie - player.coffee, utils.coffee
+
   class Monster extends Player
     constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
       super(null, @role, utils.dice(@explevel, 8), @explevel, @gainExp, @dice)

@@ -1,4 +1,4 @@
-message = if require? then require('messagelist').messagelist else messagelist
+# dependencie - messagelist.coffee, instance of the Game class
 
 traplist = [
     #hole
