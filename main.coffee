@@ -1,7 +1,18 @@
-commands =  if require? then require('commands') else window.commands
-monsterlist =  if require? then require('monsterlist') else window.monsterlist
-traplist = if require? then require('traplist') else window.traplist
-ninjitsulist = if require? then require('ninjitsulist') else window.ninjitsulist
+###
+# main.js
+# Handles all the user interaction, and bridges between classes.
+# Other files should not depend on this file to work.
+#
+# The only file you have to modify when you port this project to a new environment is this.
+# This version targets html5 web browsers.
+#
+# Newing classes should only happen in this file.
+#
+# dependencies - command.coffee, game.coffee, (index.html),
+#                (lib/jquery), map.coffee, messagelist.coffee, monster.coffee,
+#                monsterlist.coffee, (nhtiles/*.gif), ninjitsulist.coffee, player.coffee,
+#                (tile.coffee), traplist.coffee
+###
 
 MAP_WIDTH = 40
 MAP_HEIGHT = 30
@@ -23,7 +34,8 @@ window.addEventListener('load', ->
     '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."',
     'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
-
+  ## Use jQuery for cross-browser keyboard event handling.
+  ## This should be replaced with a lighter function specialized for this occasion.
   $(document).on('keypress', (e) ->
     keyChar = getKeyChar(e.which) #middleware wraps the keycode difference in each browser
     direction = {'k' : 'u', 'j' : 'd', 'l' : 'r',  'h' : 'l'} #kjlh
@@ -37,8 +49,9 @@ window.addEventListener('load', ->
   )
 
   game.on('turn', ->
+    ## 0.5 may well be too much, nedd more conideration
     if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
-      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...)
+      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'

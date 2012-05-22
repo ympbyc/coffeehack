@@ -1,8 +1,18 @@
+###
+# monster.coffeee
+# Monsters are players, with a extended walk method.
+# They are designed to chase "the player" and attack them
+#
+# dependencie - player.coffee, utils.coffee
+###
+
   class Monster extends Player
     constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
-      hp = utils.dice(@explevel, 8) #NETHACK LOGIC
+      hp = utils.dice(@explevel, 8) # NETHACK LOGIC
       super(null, @role, hp, @explevel, @gainExp, @dice)
 
+    ## Chase "the player" when it can. Otherwise walk a random direction.
+    #
     move : (map, x, y) ->
       fallback = (->
         table = ['u', 'd', 'r', 'l']

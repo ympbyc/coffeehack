@@ -1,3 +1,5 @@
+#dependencie - instance of the Game class
+
 ninjitsulist = [
   {
     name : 'jistu of healing',

@@ -1,3 +1,5 @@
+# dependencie - index.html
+
 class Tile
   CELL_SIZE = 16
   WIDTH = CELL_SIZE*25
