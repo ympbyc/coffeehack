@@ -22,8 +22,8 @@ window.addEventListener('load', ->
     '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."',
     'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
-  document.addEventListener('keypress', (e) ->
-    keyChar = getKeyChar(e.keyCode)
+  $(document).on('keypress', (e) ->
+    keyChar = getKeyChar(e.which)
     direction = {'k' : 'u', 'j' : 'd', 'l' : 'r',  'h' : 'l'} #kjlh
     if direction[keyChar]
       game.player.walk(game.currentMap(),  direction[keyChar])
