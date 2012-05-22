@@ -50,7 +50,7 @@ window.addEventListener('load', ->
   game.on('turn', ->
     ## 0.5 may well be too much, nedd more conideration
     if (Math.random()*10 < 0.5 and game.countMonster() < 10)
-      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...)
+      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
