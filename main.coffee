@@ -16,6 +16,7 @@
 
 MAP_WIDTH = 40 #25
 MAP_HEIGHT = 30 #18
+MAX_MONSTAR = 10
 MESSAGE_SIZE = 4
 
 window.addEventListener('load', ->
@@ -49,7 +50,7 @@ window.addEventListener('load', ->
 
   game.on('turn', ->
     ## 0.5 may well be too much, nedd more conideration
-    if (Math.random()*10 < 0.5 and game.countMonster() < 10)
+    if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
       monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
