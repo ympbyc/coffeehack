@@ -10,11 +10,17 @@
     @TRAP_ACTIVE = 5.1
     @ITEM = 6
 
+    ## create a two dimentional array representing the map.
+    ## prefill each cell with false
+    #
     initMap = (width, height) ->
       map = for i in [0 ... height]
         arr = for i in [0 ... width]
           Map.EMPTY
 
+    ## split the map recursively into sections.
+    ## this is probably the ugliest piece of code in this project.
+    #
     splitMap = (map, splitMode) ->
       map = map.concat([])
       height = map.length
@@ -23,6 +29,8 @@
       SPLIT_HORIZONTAL = 2
       MINIMUM_LENGTH = 12
 
+      ## When the section gets small enough, create a room in it and return
+      #
       return createRoom(map) if width < MINIMUM_LENGTH or height < MINIMUM_LENGTH
 
       splitMode = splitMode or Math.round(Math.random())
@@ -57,6 +65,10 @@
 
         return splitMap(upperHalf, SPLIT_VERTICAL).concat splitRow.concat splitMap(lowerHalf, SPLIT_VERTICAL)
 
+    ## A room has the margin of 1 cell around it.
+    ## A cell in the centre of each wall is a room cell and from it a path piece extends to reach the section spilit line
+    ## which will be used as paths.
+    #
     createRoom = (section) ->
       return section if section.length < 5 or section[0].length < 5
       section = section.concat([])
@@ -75,6 +87,8 @@
       section[section.length-1][horiz_center] = Map.PATH; section[section.length-2][horiz_center] = Map.ROOM;
       section
 
+    ## create special cells such as staircases, traps and ninjitsu fields
+    #
     createSpecialCells = (map) ->
       map = map.concat([])
       f = (type, occurance = 1) ->
@@ -94,6 +108,8 @@
       @_map = createSpecialCells(splitMap(initMap(@width, @height), 1))
       @reserved = []
 
+    ## build a string visualising the map.
+    #
     show : () ->
       str =  (for row in @_map
         (for cell in row
@@ -115,30 +131,47 @@
 
     walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
 
+    ## Checks for the cell type and reservation
+    #
     isWalkable : (x, y) ->
       @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1 and not @getReservation(x, y)
 
+    ## Only checks for the map type
+    #
     isAttackable : (x, y) ->
       @_map[y] and @_map[y][x] and walkable.indexOf(@_map[y][x]) > -1
 
+    ## Give it a map type and it'll set the cell to be it
+    #
     setCell : (x, y, char) ->
       @_map[y][x] = char
 
+    ## Returns whatever is the cell set to
+    #
     getCell : (x, y) ->
       @_map[y][x]
 
+    ## Makes the cell exclusive to the object given.
+    ## player and monsters should reserve a cell each time they move.
+    #
     reserveCell : (x, y, obj) ->
       if not @reserved[y] then @reserved[y] = {}
       if not @reserved[y][x] then @reserved[y][x] = obj
       else throw 'cell already reserved'
 
+    ## Get whats in the reservation array
+    #
     getReservation : (x, y) ->
       if @reserved[y] and @reserved[y][x] then @reserved[y][x]
       else false
 
+    ## Make the cell available for others
+    #
     clearReservation : (x, y) ->
       @reserved[y][x] = null
 
+    ## Returns an array containing the reservation of surrounding 8 cells
+    #
     getNearByCells : (x, y) ->
       [
         @getReservation(x+1, y),
