@@ -50,8 +50,8 @@ class Tile
         vampire : loadImage(227),
         'stone golem' : loadImage(259),
         jabberwock : loadImage(179),
-        angle : loadImage(124),
-        dragon : loadImage(147),
+        angel : loadImage(124),
+        'red dragon' : loadImage(147),
         'Demogorgon' : loadImage(313)
       },
     }
