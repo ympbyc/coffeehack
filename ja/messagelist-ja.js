@@ -21,7 +21,7 @@ messagelist_ja.trap = {
 };
 
 messagelist_ja.player = {
-  attack: "あなたの攻撃は?に当たった."
+  attack: "あなたは?を?."
 };
 
 messagelist_ja.monster = {
