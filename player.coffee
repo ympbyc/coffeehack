@@ -1,11 +1,12 @@
-###
-# player.coffee
-# Defines the properties and behaviour of a character
-# Monsters extend this class therefore if the word 'player' appears
-# in this file, it also represents monsters
-#
-# dependencie - utils.coffee
-###
+  ###
+  # player.coffee
+  # Defines the properties and behaviour of a character
+  # Monsters extend this class therefore if the word 'player' appears
+  # in this file, it also represents monsters
+  #
+  # dependencie - utils.coffee
+  ###
+
   class Player extends EventEmitter
 
     ## explevel vs experience

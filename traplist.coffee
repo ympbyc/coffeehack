@@ -1,5 +1,6 @@
 # dependencie - messagelist.coffee, instance of the Game class
 
+message = messagelist
 traplist = [
     #hole
   (game) ->

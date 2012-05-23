@@ -16,7 +16,7 @@
 
 MAP_WIDTH = 40 #25
 MAP_HEIGHT = 30 #18
-MAX_MONSTAR = 10
+MAX_MONSTER = 10
 MESSAGE_SIZE = 4
 
 window.addEventListener('load', ->
