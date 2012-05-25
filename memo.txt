@@ -1,6 +1,34 @@
-モンスターの出現階層の調整
-プレイヤーの体力アップ
-スペシャルマス
-メッセージの履歴
+モンスターの出現階層の調整 done
+プレイヤーの体力アップ done
+スペシャルマス done
+メッセージの履歴 done
+MMORPG new
 
 node.js 0.6.18
+
+
+*MMORPG
+user - user, client - server model
+user - user, peer 2 peer model
+central server - multi user, server - client model
+
+**central server
+has fixed maps
+handles new connections #HEAVY
+handles the key strokes and message passing
+do not render the whole map each time a user move. 
+instead just send the changed coordinates
+
+**consideration
+can they kill each other #YES
+what is used to identify a player #SESSION
+how to send messages back and forth between browser and server #WEB SOCKETS
+
+
+
+
+
+OOP considerations
+
+Should the player have the method to increment his HP on each turn?
+or the game class having it is totally ok?
