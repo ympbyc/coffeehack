@@ -3,7 +3,7 @@
   class Game extends EventEmitter
     constructor : ->
       super()
-      @monsterStack = [[]]
+      @monsterStack = [[]] #y-axis holds floor levels
       @mapStack = []
       @level = -1
       @time = 0

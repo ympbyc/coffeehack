@@ -1,5 +1,5 @@
 ###
-# main.js
+# main.cofffee
 # Handles all the user interaction, and bridges between classes.
 # Other files should not depend on this file to work.
 #
@@ -19,9 +19,9 @@ MAP_HEIGHT = 30
 MAX_MONSTER = 10 #maximum number of monsters that can exist on the map
 MESSAGE_SIZE = 4 #number of massages to save
 
-main  = ->
+main_ja = ->
   game = new Game()
-  game.setPlayer(new Player('coffeedrinker', 'Ninja', 12))
+  game.setPlayer(new Player('コーヒー飲み', 'Ninja', 12))
   game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
   game.nextMap()
   game.player.born(game.currentMap())
@@ -29,10 +29,10 @@ main  = ->
   currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
   message = [
     '',
-    ' The following is written in a secret scroll you inherited from your ancestor.',
-    '  "There once were mean dragons crawling all around us on the ground',
-    '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."',
-    'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
+    '忍者の一族の末裔であるあなたの家には、次のように書かれた巻物が代々伝わっている.',
+    '  "以前、このあたりは竜どもが這い回る荒れ果てた土地だった.',
+    '   1997年に私たちは県知事の命を受けこの土地を開拓し、その際竜どもを街の中心部にあるダンジョンに閉じ込めた."',
+    'coffeehackへようこそ！あなたの街の市長はあなたに竜退治を依頼している.地下鉄を敷きたいそうだ！']
 
   ## Use jQuery for cross-browser keyboard event handling.
   ## This should be replaced with a lighter function specialized for this occasion.
@@ -53,9 +53,9 @@ main  = ->
     if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
       monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
-        tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
-        action = if Math.round(Math.random()) then e.me.action else 'hits'
-        game.fire('message', {message : messagelist.format(messagelist.monster.attack, e.me.role, action, tgt)})
+        tgt = if e.enemy.name then 'あなた' else e.enemy.role
+        action = if Math.round(Math.random()) then e.me.action else '攻撃した'
+        game.fire('message', {message : messagelist.format(messagelist.monster.attack, e.me.role, tgt, action)})
       )
       game.addMonster(monster)
     game.moveAllMonsters()
@@ -65,8 +65,8 @@ main  = ->
   game.on('turnend', ->
     #document.getElementById('jshack').innerHTML = game.drawStage() #activate when you want the text-mode
     updateCanvas(game.drawStage()) #draw the current map on the canvas
-    status = [game.player.name, '@ floor -', game.level, '\n',
-      'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time
+    status = [game.player.name, '@ 地下', game.level, '階\n',
+      'HP:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), '経験値:', Math.floor(game.player.experience*10)*1/10, '経過ターン:', game.time
     ].join(' ')
     game.fire('status', {status : status}) #writes out the status line at the botttom
   )
@@ -104,8 +104,8 @@ main  = ->
   )
 
   game.player.on('attack', (e) ->
-    mode = if e.enemy.isDead() then 'killed' else 'hit'
-    game.fire('message', {message : messagelist.format(messagelist.player.attack, mode, e.enemy.role)})
+    mode = if e.enemy.isDead() then '倒した' else '攻撃した'
+    game.fire('message', {message : messagelist.format(messagelist.player.attack, e.enemy.role, mode)})
   )
 
   game.player.on('move', (e) ->
@@ -118,7 +118,7 @@ main  = ->
   game.player.on('move', (ev) ->
     if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.ITEM
       ninjitsu = ninjitsulist[Math.floor(Math.random()*ninjitsulist.length)] #ninjutsus, too decided randomly
-      game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. spell? (y or anything else)"})
+      game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. ニンジュツを使いますか? (y もしくはy以外)"})
       listener = (e) ->
         document.removeEventListener('keypress', listener)
         if getKeyChar(e.keyCode) is 'y'
@@ -129,7 +129,7 @@ main  = ->
       document.addEventListener('keypress', listener)
   )
   game.player.on('explevelup', (e) ->
-    game.fire('message', {message : "Welcome to experience level #{e.explevel}."})
+    game.fire('message', {message : "経験レベル#{e.explevel}へようこそ！."})
   )
 
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
@@ -163,6 +163,7 @@ main  = ->
 
   game.fire('turn')
 
+
 getKeyChar = (keyCode) ->
   keyChar = {
     62 : '>',
@@ -195,6 +196,3 @@ unless Function::bind
     fNOP:: = @::
     fBound:: = new fNOP()
     fBound
-
-
-#window.addEventListener('load', main)

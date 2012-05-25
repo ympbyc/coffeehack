@@ -17,6 +17,12 @@
     <script src="traplist.js"></script>
     <script src="tile.js"></script>
     <script src="main.js"></script>
+    
+    <script src="ja/ninjitsulist-ja.js"></script>
+    <script src="ja/messagelist-ja.js"></script>
+    <script src="ja/monsterlist-ja.js"></script>
+    <script src="ja/tile-ja.js"></script>
+    <script src="ja/main-ja.js"></script>
     <style type="text/css">
       pre {
         font-size : 11px;
@@ -64,5 +70,16 @@
       A message should appear in the message area at the top asking you if you wanna use that jitsu or not.
       If you do, you press "y" key otherwise press any key other than "y".
     </div>
+    
+    <script type="text/javascript">
+      if (location.search.match('lang=ja')) {
+        messagelist = messagelist_ja;
+        ninjitsulist = ninjitsulist_ja;
+        monsterlist = monsterlist_ja;
+        Tile = TileJa;
+        main = main_ja;
+      }
+      window.addEventListener('load', main)
+    </script>
   </body>
 </html>
