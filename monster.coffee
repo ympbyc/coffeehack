@@ -1,10 +1,10 @@
-  ###
-  # monster.coffeee
-  # Monsters are players, with a extended walk method.
-  # They are designed to chase "the player" and attack them
-  #
-  # dependencie - player.coffee, utils.coffee
-  ###
+###
+# monster.coffeee
+# Monsters are players, with an extended method walk.
+# They are designed to chase "the player" and attack them
+#
+# dependencie - player.coffee, utils.coffee
+###
 
 class Monster extends Player
   constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
