@@ -16,14 +16,14 @@ coffeehack currently doesn't have items because of its suspected difficulty of i
 Instead it has a special cells set up that perform similar roles to what items do.
 They are called "ninjitsu filed"s. When you walk onto it, a message will appear at the message line at the top
 asking if you'd like to cast that spell or not. A ninjitsu is much like a magic and most of them are designed to help you.
-It might be possible that ninjitsus will be replaced by the traitional item system.      
+It might be possible that ninjitsus will be replaced by the traditional item system.      
 
 coffeehack implements the same fighting system as many rogue-likes, meaning that it doesn't have a fighting mode.
-You simply walk into the enemy, and the attack happens.
+You simply walk into the enemy, and the attack occurs.
 
 The game has many parameters you should be aware of. All of them are displayed in the status lines
 at the bottom of the screen. The most important one is the HP (hit points). You will gain some HPs when your
-experience level goes up. If you lose them all you'll die. coffeehack is yet to manage the stomuch emptyness but is
+experience level goes up. If you lose them all you die. coffeehack is yet to manage the stomuch emptyness but is
 prioritized highly.
 
 key-binding
