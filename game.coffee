@@ -4,6 +4,7 @@
     constructor : ->
       super()
       @monsterStack = [[]] #y-axis holds floor levels
+      @itemStack = [[]] #y-axis holds floor levels
       @mapStack = []
       @level = -1
       @time = 0
@@ -53,6 +54,7 @@
     #
     levelInit : ->
       @monsterStack.push([]) if not @monsterStack[@level]
+      @itemStack.push([]) if not @itemStack[@level]
 
     ## Add a monster to the stack
     ## Stacks are associated with floor levels
@@ -88,6 +90,25 @@
           m.move(@currentMap(), pp.x, pp.y)
           m.fire('move')
 
+    ## add given item to the itemstack
+    #
+    addItem : (x, y, item) ->
+      items = @itemStack[@level]
+      if not items[y]? then items[y] = {}
+      if not items[y][x]? then items[y][x] = [item]
+      else items[y][x].push(item)
+
+    getItems : (x, y) ->
+      items = @itemStack[@level]
+      return null if not (items[y] and items[y][x])
+      return items[y][x]
+
+    shiftItem : (x, y) ->
+      items = @itemStack[@level]
+      if items[y]?[x]?
+        items[y][x].shift()
+
+
     ## Call this on each passing turn
     #
     turnInit : ->
@@ -105,6 +126,15 @@
     #
     drawStage : ->
       map = @currentMap()
+
+      saveItemCell = []
+      items = @itemStack[@level]
+      for i in [0...map._map.length]
+        for j, x of (if items[i]? then items[i] else [])
+          if items[i]?[j]?.length
+            saveItemCell.push({x: j, y: i, save: map.getCell(j, i)})
+            map.setCell(j, i, ')') #items[i][j][0]) #first item in the pile
+
       playerPos = @player.getPosition()
       savePlayerCell = map.getCell(playerPos.x, playerPos.y)
       map.setCell(playerPos.x, playerPos.y, '@')
@@ -116,10 +146,14 @@
           saveMonsterCell.push({x : monsterPos.x, y : monsterPos.y, save : map.getCell(monsterPos.x, monsterPos.y)})
           map.setCell(monsterPos.x, monsterPos.y, m.char)
 
+
       ret = map.show()
 
       map.setCell(playerPos.x, playerPos.y, savePlayerCell)
       for s in saveMonsterCell
+        map.setCell(s.x, s.y, s.save)
+      for s in saveItemCell
+        console.log(s)
         map.setCell(s.x, s.y, s.save)
 
       ret

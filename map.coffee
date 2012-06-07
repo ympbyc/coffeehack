@@ -1,3 +1,5 @@
+  #dep utils
+
   class Map
     @EMPTY = 0
     @PATH = 1
@@ -8,7 +10,7 @@
     @STAIR_DOWN = 4.2
     @TRAP = 5
     @TRAP_ACTIVE = 5.1
-    @ITEM = 6
+    @NINJITSU = 6
 
     ## create a two dimentional array representing the map.
     ## prefill each cell with false
@@ -93,15 +95,15 @@
       map = map.concat([])
       f = (type, occurance = 1) ->
         if occurance
-          x = Math.floor(Math.random()*map[0].length); y = Math.floor(Math.random()*map.length)
+          x = utils.randomInt(map[0].length); y = utils.randomInt(map.length)
           if map[y][x] and map[y][x] is Map.ROOM
             map[y][x] =  type
             f(type, occurance -= 1)
           else f(type, occurance)
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
-      f(Map.TRAP, Math.floor(Math.random()*10))
-      f(Map.ITEM, Math.floor(Math.random()*10+3))
+      f(Map.TRAP, utils.randomInt(10))
+      f(Map.NINJITSU, utils.randomInt(10+3))
       map
 
     constructor : (@width, @height) ->
@@ -123,13 +125,13 @@
             when Map.PATH then '#'
             when Map.STAIR_UP then '<'
             when Map.STAIR_DOWN then '>'
-            when Map.ITEM then '*'
+            when Map.NINJITSU then '*'
             else cell
         ).join('')
       ).join('\n')
       str
 
-    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM]
+    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.NINJITSU]
 
     ## Checks for the cell type and reservation
     #

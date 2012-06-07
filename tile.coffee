@@ -22,7 +22,10 @@ class Tile
         trap_active : loadImage(874),
         stair_up : loadImage(851),
         stair_down : loadImage(852),
-        item : loadImage(903)
+        ninjitsu : loadImage(903)
+      },
+      item : {
+        weapon : loadImage(431),
       },
       monster : {
         player : loadImage(388),

@@ -11,7 +11,7 @@
 # dependencies - command.coffee, game.coffee, (index.html),
 #                (lib/jquery), map.coffee, messagelist.coffee, monster.coffee,
 #                monsterlist.coffee, (nhtiles/*.gif), ninjitsulist.coffee, player.coffee,
-#                (tile.coffee), traplist.coffee
+#                (tile.coffee), traplist.coffee, itemlist.coffee, item.coffee
 ###
 
 MAP_WIDTH = 40
@@ -37,13 +37,16 @@ main  = ->
   ## Use jQuery for cross-browser keyboard event handling.
   ## This should be replaced with a lighter function specialized for this occasion.
   $(document).on('keypress', (e) ->
+#    console.log(e.which)
     keyChar = getKeyChar(e.which) #middleware wraps the keycode difference in each browser
+
     direction = {'k' : 'u', 'j' : 'd', 'l' : 'r',  'h' : 'l'} #kjlh
     if direction[keyChar]
       game.player.walk(game.currentMap(),  direction[keyChar])
 
-    if commands[keyChar]
-      commands[keyChar](game)
+    if commands[keyChar]?
+      f = commands[keyChar](game)
+      game.fire('argumentrequest', {command : f}) if f? #for commands that take an argument
 
     game.fire('turn')
   )
@@ -51,13 +54,18 @@ main  = ->
   game.on('turn', ->
     ## 0.5 may well be too much, nedd more conideration
     if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
-      monster = new Monster(currentmonsterlist[Math.floor(Math.random()*currentmonsterlist.length)]...) # NETHACK LOGIC
+      monster = new Monster(currentmonsterlist[utils.randomInt(currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
         game.fire('message', {message : messagelist.format(messagelist.monster.attack, e.me.role, action, tgt)})
       )
+      monster.on('die', (e) ->
+        pos = e.beef.getPosition()
+        game.addItem(pos.x, pos.y, new Item(items.weapons[utils.randomInt(items.weapons.length)]...))
+      )
       game.addMonster(monster)
+
     game.moveAllMonsters()
     game.fire('turnend')
   )
@@ -103,6 +111,13 @@ main  = ->
     document.getElementById('status').innerHTML = e.status
   )
 
+  game.on('argumentrequest', (e) ->
+    listener = (ev) ->
+      document.removeEventListener('keypress', listener)
+      e.command(getKeyChar(ev.keyCode))
+    document.addEventListener('keypress', listener)
+  )
+
   game.player.on('attack', (e) ->
     mode = if e.enemy.isDead() then 'killed' else 'hit'
     game.fire('message', {message : messagelist.format(messagelist.player.attack, mode, e.enemy.role)})
@@ -112,12 +127,12 @@ main  = ->
     if [Map.TRAP, Map.TRAP_ACTIVE].indexOf(game.currentMap().getCell(e.position.x, e.position.y)) > -1
       pp = game.player.getPosition()
       game.currentMap().setCell(pp.x, pp.y, Map.TRAP_ACTIVE)
-      traplist[Math.floor(Math.random()*traplist.length)](game) #trap type is decided randomly on the fly
+      traplist[utils.randomInt(traplist.length)](game) #trap type is decided randomly on the fly
   )
 
   game.player.on('move', (ev) ->
-    if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.ITEM
-      ninjitsu = ninjitsulist[Math.floor(Math.random()*ninjitsulist.length)] #ninjutsus, too decided randomly
+    if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.NINJITSU
+      ninjitsu = ninjitsulist[utils.randomInt(ninjitsulist.length)] #ninjutsus, too decided randomly
       game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. spell? (y or anything else)"})
       listener = (e) ->
         document.removeEventListener('keypress', listener)
@@ -154,8 +169,9 @@ main  = ->
           when '^' then ['map', 'trap_active']
           when '<' then ['map', 'stair_up']
           when '>' then ['map', 'stair_down']
-          when '*' then ['map', 'item']
+          when '*' then ['map', 'ninjitsu']
           when '@' then ['monster', 'player']
+          when ')' then ['item', 'weapon']
           else
             ['monster', monstermap[mapstr[ptr]]]
 
@@ -164,22 +180,7 @@ main  = ->
   game.fire('turn')
 
 getKeyChar = (keyCode) ->
-  keyChar = {
-    62 : '>',
-    60 : '<',
-    107 : 'k',
-    106 : 'j',
-    108 : 'l',
-    104 : 'h',
-    38 : 'k',
-    40 : 'j',
-    39 : 'l',
-    37 : 'h',
-    46 : '.',
-    121 : 'y',
-    110 : 'n'
-  }
-  keyChar[keyCode]
+  String.fromCharCode(keyCode)
 
 
 unless Function::bind
