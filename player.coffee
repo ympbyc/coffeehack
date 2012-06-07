@@ -26,6 +26,7 @@
       super()
       @_position = {}
       @experience = 0
+      @inventory = new Inventory()
       @on('godown', ((e) ->
         e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
       ).bind(@))
@@ -80,7 +81,7 @@
       enemy.hp -= utils.dice(@dice[0], @dice[1])
       if enemy.isDead()
         @killedAnEnemy(enemy)
-        enemy.fire('die')
+        enemy.fire('die', {beef : enemy})
       @fire('attack', {me : @, enemy : enemy})
 
     ## Get the experience point the enemy defeated has.
@@ -107,3 +108,9 @@
     #
     setPosition : (x, y) ->
       @_position = {x : x, y : y}
+
+    wield : (ch) ->
+      weapon = @inventory.getItem(ch) or null
+      console.log weapon
+      @dice = weapon.dice if weapon?
+      weapon
