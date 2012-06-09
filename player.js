@@ -35,6 +35,7 @@ Player = (function(_super) {
     Player.__super__.constructor.call(this);
     this._position = {};
     this.experience = 0;
+    this.inventory = new Inventory();
     this.on('godown', (function(e) {
       if (e.prevMap) {
         return e.prevMap.clearReservation(this.getPosition().x, this.getPosition().y);
@@ -68,11 +69,15 @@ Player = (function(_super) {
   };
 
   Player.prototype.walk = function(map, direction) {
-    var DOWN, LEFT, RIGHT, UP, m, nextPos;
+    var DOWN, LEFT, LWRLFT, LWRRGT, RIGHT, UP, UPRLFT, UPRRGT, m, nextPos;
     UP = 'u';
     DOWN = 'd';
     RIGHT = 'r';
     LEFT = 'l';
+    UPRLFT = 'ul';
+    UPRRGT = 'ur';
+    LWRLFT = 'll';
+    LWRRGT = 'lr';
     nextPos = {
       x: this._position.x,
       y: this._position.y
@@ -89,6 +94,22 @@ Player = (function(_super) {
         break;
       case LEFT:
         nextPos.x -= 1;
+        break;
+      case UPRLFT:
+        nextPos.x -= 1;
+        nextPos.y -= 1;
+        break;
+      case UPRRGT:
+        nextPos.x += 1;
+        nextPos.y -= 1;
+        break;
+      case LWRLFT:
+        nextPos.x -= 1;
+        nextPos.y += 1;
+        break;
+      case LWRRGT:
+        nextPos.x += 1;
+        nextPos.y += 1;
     }
     if (map.isWalkable(nextPos.x, nextPos.y)) {
       map.clearReservation(this._position.x, this._position.y);
@@ -109,7 +130,9 @@ Player = (function(_super) {
     enemy.hp -= utils.dice(this.dice[0], this.dice[1]);
     if (enemy.isDead()) {
       this.killedAnEnemy(enemy);
-      enemy.fire('die');
+      enemy.fire('die', {
+        beef: enemy
+      });
     }
     return this.fire('attack', {
       me: this,
@@ -145,6 +168,16 @@ Player = (function(_super) {
       x: x,
       y: y
     };
+  };
+
+  Player.prototype.wield = function(ch) {
+    var weapon;
+    weapon = this.inventory.getItem(ch) || null;
+    console.log(weapon);
+    if (weapon != null) {
+      this.dice = weapon.dice;
+    }
+    return weapon;
   };
 
   return Player;

@@ -10,6 +10,7 @@ Game = (function(_super) {
   function Game() {
     Game.__super__.constructor.call(this);
     this.monsterStack = [[]];
+    this.itemStack = [[]];
     this.mapStack = [];
     this.level = -1;
     this.time = 0;
@@ -55,7 +56,10 @@ Game = (function(_super) {
 
   Game.prototype.levelInit = function() {
     if (!this.monsterStack[this.level]) {
-      return this.monsterStack.push([]);
+      this.monsterStack.push([]);
+    }
+    if (!this.itemStack[this.level]) {
+      return this.itemStack.push([]);
     }
   };
 
@@ -110,6 +114,36 @@ Game = (function(_super) {
     return _results;
   };
 
+  Game.prototype.addItem = function(x, y, item) {
+    var items;
+    items = this.itemStack[this.level];
+    if (!(items[y] != null)) {
+      items[y] = {};
+    }
+    if (!(items[y][x] != null)) {
+      return items[y][x] = [item];
+    } else {
+      return items[y][x].push(item);
+    }
+  };
+
+  Game.prototype.getItems = function(x, y) {
+    var items;
+    items = this.itemStack[this.level];
+    if (!(items[y] && items[y][x])) {
+      return null;
+    }
+    return items[y][x];
+  };
+
+  Game.prototype.shiftItem = function(x, y) {
+    var items, _ref;
+    items = this.itemStack[this.level];
+    if (((_ref = items[y]) != null ? _ref[x] : void 0) != null) {
+      return items[y][x].shift();
+    }
+  };
+
   Game.prototype.turnInit = function() {
     this.time++;
     if (this.player.hp < this.player.getMaxHP()) {
@@ -124,33 +158,45 @@ Game = (function(_super) {
     }
   };
 
-  Game.prototype.drawStage = function() {
-    var m, map, monsterPos, playerPos, ret, s, saveMonsterCell, savePlayerCell, _i, _j, _len, _len1, _ref;
+  Game.prototype.drawObjects = function() {
+    var column, i, items, j, m, map, monsterPos, objectLayer, pp, row, x, _i, _j, _len, _ref, _ref1, _ref2, _ref3, _ref4;
     map = this.currentMap();
-    playerPos = this.player.getPosition();
-    savePlayerCell = map.getCell(playerPos.x, playerPos.y);
-    map.setCell(playerPos.x, playerPos.y, '@');
-    saveMonsterCell = [];
-    _ref = this.monsterStack[this.level];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      m = _ref[_i];
-      if (m) {
-        monsterPos = m.getPosition();
-        saveMonsterCell.push({
-          x: monsterPos.x,
-          y: monsterPos.y,
-          save: map.getCell(monsterPos.x, monsterPos.y)
-        });
-        map.setCell(monsterPos.x, monsterPos.y, m.char);
+    objectLayer = (function() {
+      var _i, _ref, _results;
+      _results = [];
+      for (row = _i = 0, _ref = map.height; 0 <= _ref ? _i < _ref : _i > _ref; row = 0 <= _ref ? ++_i : --_i) {
+        _results.push((function() {
+          var _j, _ref1, _results1;
+          _results1 = [];
+          for (column = _j = 0, _ref1 = map.width; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; column = 0 <= _ref1 ? ++_j : --_j) {
+            _results1.push(0);
+          }
+          return _results1;
+        })());
+      }
+      return _results;
+    })();
+    items = this.itemStack[this.level];
+    for (i = _i = 0, _ref = map.height; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      _ref1 = (items[i] != null ? items[i] : []);
+      for (j in _ref1) {
+        x = _ref1[j];
+        if ((_ref2 = items[i]) != null ? (_ref3 = _ref2[j]) != null ? _ref3.length : void 0 : void 0) {
+          objectLayer[i][j] = items[i][j][0];
+        }
       }
     }
-    ret = map.show();
-    map.setCell(playerPos.x, playerPos.y, savePlayerCell);
-    for (_j = 0, _len1 = saveMonsterCell.length; _j < _len1; _j++) {
-      s = saveMonsterCell[_j];
-      map.setCell(s.x, s.y, s.save);
+    pp = this.player.getPosition();
+    objectLayer[pp.y][pp.x] = this.player;
+    _ref4 = this.monsterStack[this.level];
+    for (_j = 0, _len = _ref4.length; _j < _len; _j++) {
+      m = _ref4[_j];
+      if (m) {
+        monsterPos = m.getPosition();
+        objectLayer[monsterPos.y][monsterPos.x] = m;
+      }
     }
-    return ret;
+    return objectLayer;
   };
 
   return Game;

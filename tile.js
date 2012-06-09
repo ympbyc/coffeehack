@@ -29,10 +29,16 @@ Tile = (function() {
         trap_active: loadImage(874),
         stair_up: loadImage(851),
         stair_down: loadImage(852),
-        item: loadImage(903)
+        ninjitsu: loadImage(903)
+      },
+      weapon: {
+        longsword: loadImage(431),
+        katana: loadImage(433),
+        stone: loadImage(822),
+        mace: loadImage(450)
       },
       monster: {
-        player: loadImage(388),
+        Ninja: loadImage(388),
         'grid bug': loadImage(117),
         jackal: loadImage(12),
         newt: loadImage(326),
@@ -67,15 +73,22 @@ Tile = (function() {
   })();
 
   function Tile(cvid) {
-    this.surface = document.getElementById(cvid).getContext('2d');
+    this.canvas = document.getElementById(cvid);
+    this.surface = this.canvas.getContext('2d');
+    this.currentMapImage;
   }
 
   Tile.prototype.update = function(x, y, type, name) {
-    try {
-      return this.surface.drawImage(Tile.images[type][name], x * CELL_SIZE, y * CELL_SIZE);
-    } catch (e) {
-      return alert(type + ' ' + name);
-    }
+    return this.surface.drawImage(Tile.images[type][name], x * CELL_SIZE, y * CELL_SIZE);
+  };
+
+  Tile.prototype.toDataUrl = function() {
+    this.currentMapImage = new Image();
+    return this.currentMapImage.src = this.canvas.toDataURL('image/png');
+  };
+
+  Tile.prototype.resetWithMap = function() {
+    return this.surface.drawImage(this.currentMapImage, 0, 0);
   };
 
   return Tile;

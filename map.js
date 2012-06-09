@@ -22,7 +22,7 @@ Map = (function() {
 
   Map.TRAP_ACTIVE = 5.1;
 
-  Map.ITEM = 6;
+  Map.NINJITSU = 6;
 
   initMap = function(width, height) {
     var arr, i, map;
@@ -57,7 +57,7 @@ Map = (function() {
     splitMode = splitMode || Math.round(Math.random());
     if (splitMode === SPLIT_VERTICAL) {
       xPosition = Math.round(Math.random() * (width - 10) + 5);
-      for (i = _i = 2, _ref = map.length - 2; 2 <= _ref ? _i < _ref : _i > _ref; i = 2 <= _ref ? ++_i : --_i) {
+      for (i = _i = 0, _ref = map.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         map[i][xPosition] = Map.PATH;
       }
       leftHalf = [];
@@ -82,7 +82,7 @@ Map = (function() {
       return finalResult;
     } else if (splitMode === SPLIT_HORIZONTAL) {
       yPosition = Math.round(Math.random() * (height - 10) + 5);
-      for (i = _k = 2, _ref1 = map[yPosition].length - 2; 2 <= _ref1 ? _k < _ref1 : _k > _ref1; i = 2 <= _ref1 ? ++_k : --_k) {
+      for (i = _k = 0, _ref1 = map[yPosition].length; 0 <= _ref1 ? _k < _ref1 : _k > _ref1; i = 0 <= _ref1 ? ++_k : --_k) {
         map[yPosition][i] = Map.PATH;
       }
       upperHalf = map.slice(0, yPosition);
@@ -98,8 +98,8 @@ Map = (function() {
       return section;
     }
     section = section.concat([]);
-    for (i = _i = 1, _ref = section.length - 2; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
-      for (j = _j = 1, _ref1 = section[i].length - 2; 1 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 1 <= _ref1 ? ++_j : --_j) {
+    for (i = _i = 1, _ref = section.length - 1; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
+      for (j = _j = 1, _ref1 = section[i].length - 1; 1 <= _ref1 ? _j < _ref1 : _j > _ref1; j = 1 <= _ref1 ? ++_j : --_j) {
         if (i === 1 || i === section.length - 2) {
           section[i][j] = Map.WALL_HORIZ;
         } else if (j === 1 || j === section[i].length - 2) {
@@ -131,8 +131,8 @@ Map = (function() {
         occurance = 1;
       }
       if (occurance) {
-        x = Math.floor(Math.random() * map[0].length);
-        y = Math.floor(Math.random() * map.length);
+        x = utils.randomInt(map[0].length);
+        y = utils.randomInt(map.length);
         if (map[y][x] && map[y][x] === Map.ROOM) {
           map[y][x] = type;
           return f(type, occurance -= 1);
@@ -143,8 +143,8 @@ Map = (function() {
     };
     f(Map.STAIR_UP);
     f(Map.STAIR_DOWN);
-    f(Map.TRAP, Math.floor(Math.random() * 10));
-    f(Map.ITEM, Math.floor(Math.random() * 10 + 3));
+    f(Map.TRAP, utils.randomInt(10));
+    f(Map.NINJITSU, utils.randomInt(10 + 3));
     return map;
   };
 
@@ -196,11 +196,11 @@ Map = (function() {
               case Map.STAIR_DOWN:
                 _results1.push('>');
                 break;
-              case Map.ITEM:
+              case Map.NINJITSU:
                 _results1.push('*');
                 break;
               default:
-                _results1.push(cell);
+                _results1.push(void 0);
             }
           }
           return _results1;
@@ -211,7 +211,7 @@ Map = (function() {
     return str;
   };
 
-  walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.ITEM];
+  walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.NINJITSU];
 
   Map.prototype.isWalkable = function(x, y) {
     return this._map[y] && this._map[y][x] && walkable.indexOf(this._map[y][x]) > -1 && !this.getReservation(x, y);
