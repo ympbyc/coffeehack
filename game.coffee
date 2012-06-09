@@ -4,6 +4,7 @@
     constructor : ->
       super()
       @monsterStack = [[]] #y-axis holds floor levels
+      @itemStack = [[]] #y-axis holds floor levels
       @mapStack = []
       @level = -1
       @time = 0
@@ -53,6 +54,7 @@
     #
     levelInit : ->
       @monsterStack.push([]) if not @monsterStack[@level]
+      @itemStack.push([]) if not @itemStack[@level]
 
     ## Add a monster to the stack
     ## Stacks are associated with floor levels
@@ -88,6 +90,25 @@
           m.move(@currentMap(), pp.x, pp.y)
           m.fire('move')
 
+    ## add given item to the itemstack
+    #
+    addItem : (x, y, item) ->
+      items = @itemStack[@level]
+      if not items[y]? then items[y] = {}
+      if not items[y][x]? then items[y][x] = [item]
+      else items[y][x].push(item)
+
+    getItems : (x, y) ->
+      items = @itemStack[@level]
+      return null if not (items[y] and items[y][x])
+      return items[y][x]
+
+    shiftItem : (x, y) ->
+      items = @itemStack[@level]
+      if items[y]?[x]?
+        items[y][x].shift()
+
+
     ## Call this on each passing turn
     #
     turnInit : ->
@@ -103,23 +124,22 @@
     ## Call the show method of the current map
     ## with monsters and the player set to it.
     #
-    drawStage : ->
+    drawObjects : ->
       map = @currentMap()
-      playerPos = @player.getPosition()
-      savePlayerCell = map.getCell(playerPos.x, playerPos.y)
-      map.setCell(playerPos.x, playerPos.y, '@')
+      objectLayer = (0 for column in [0...map.width] for row in [0...map.height])
 
-      saveMonsterCell = []
+      items = @itemStack[@level]
+      for i in [0...map.height]
+        for j, x of (if items[i]? then items[i] else [])
+          if items[i]?[j]?.length
+            objectLayer[i][j] = items[i][j][0]
+
+      pp = @player.getPosition()
+      objectLayer[pp.y][pp.x] = @player
+
       for m in @monsterStack[@level]
         if m
           monsterPos = m.getPosition()
-          saveMonsterCell.push({x : monsterPos.x, y : monsterPos.y, save : map.getCell(monsterPos.x, monsterPos.y)})
-          map.setCell(monsterPos.x, monsterPos.y, m.char)
+          objectLayer[monsterPos.y][monsterPos.x] = m
 
-      ret = map.show()
-
-      map.setCell(playerPos.x, playerPos.y, savePlayerCell)
-      for s in saveMonsterCell
-        map.setCell(s.x, s.y, s.save)
-
-      ret
+      objectLayer

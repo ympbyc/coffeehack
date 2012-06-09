@@ -26,6 +26,7 @@
       super()
       @_position = {}
       @experience = 0
+      @inventory = new Inventory()
       @on('godown', ((e) ->
         e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
       ).bind(@))
@@ -57,13 +58,26 @@
     ## if there is nothing in the way, move to it, clear the reservation of the current cell, and reserve the new cell.
     #
     walk : (map, direction) ->
-      UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l'
+      UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l';
+      UPRLFT = 'ul'; UPRRGT = 'ur'; LWRLFT = 'll'; LWRRGT = 'lr';
       nextPos = {x : @_position.x, y : @_position.y}
       switch direction
         when UP then nextPos.y -= 1
         when DOWN then nextPos.y += 1
         when RIGHT then nextPos.x += 1
         when LEFT then nextPos.x -= 1
+        when UPRLFT
+          nextPos.x -= 1
+          nextPos.y -= 1
+        when UPRRGT
+          nextPos.x += 1
+          nextPos.y -= 1
+        when LWRLFT
+          nextPos.x -= 1
+          nextPos.y += 1
+        when LWRRGT
+          nextPos.x += 1
+          nextPos.y += 1
       if map.isWalkable(nextPos.x, nextPos.y)
         map.clearReservation(@_position.x, @_position.y)
         @_position = nextPos
@@ -80,7 +94,7 @@
       enemy.hp -= utils.dice(@dice[0], @dice[1])
       if enemy.isDead()
         @killedAnEnemy(enemy)
-        enemy.fire('die')
+        enemy.fire('die', {beef : enemy})
       @fire('attack', {me : @, enemy : enemy})
 
     ## Get the experience point the enemy defeated has.
@@ -107,3 +121,9 @@
     #
     setPosition : (x, y) ->
       @_position = {x : x, y : y}
+
+    wield : (ch) ->
+      weapon = @inventory.getItem(ch) or null
+      console.log weapon
+      @dice = weapon.dice if weapon?
+      weapon
