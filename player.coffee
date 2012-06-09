@@ -58,13 +58,26 @@
     ## if there is nothing in the way, move to it, clear the reservation of the current cell, and reserve the new cell.
     #
     walk : (map, direction) ->
-      UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l'
+      UP = 'u'; DOWN = 'd'; RIGHT = 'r'; LEFT = 'l';
+      UPRLFT = 'ul'; UPRRGT = 'ur'; LWRLFT = 'll'; LWRRGT = 'lr';
       nextPos = {x : @_position.x, y : @_position.y}
       switch direction
         when UP then nextPos.y -= 1
         when DOWN then nextPos.y += 1
         when RIGHT then nextPos.x += 1
         when LEFT then nextPos.x -= 1
+        when UPRLFT
+          nextPos.x -= 1
+          nextPos.y -= 1
+        when UPRRGT
+          nextPos.x += 1
+          nextPos.y -= 1
+        when LWRLFT
+          nextPos.x -= 1
+          nextPos.y += 1
+        when LWRRGT
+          nextPos.x += 1
+          nextPos.y += 1
       if map.isWalkable(nextPos.x, nextPos.y)
         map.clearReservation(@_position.x, @_position.y)
         @_position = nextPos

@@ -37,6 +37,7 @@ commands = {
     (ch) ->
       weapon = game.player.wield(ch)
       game.fire('message', {message : "You wielded the #{weapon.name} #{weapon.dice[0]}d#{weapon.dice[1]}."}) if weapon?
+      game.fire('turn')
       null
 
   'd' : (game) ->

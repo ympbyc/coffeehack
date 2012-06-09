@@ -24,11 +24,14 @@ class Tile
         stair_down : loadImage(852),
         ninjitsu : loadImage(903)
       },
-      item : {
-        weapon : loadImage(431),
+      weapon : {
+        longsword : loadImage(431),
+        katana : loadImage(433),
+        stone : loadImage(822),
+        mace : loadImage(450)
       },
       monster : {
-        player : loadImage(388),
+        Ninja : loadImage(388),
         'grid bug' : loadImage(117),
         jackal : loadImage(12),
         newt : loadImage(326),
@@ -63,10 +66,19 @@ class Tile
   )()
 
   constructor : (cvid) ->
-    @surface = document.getElementById(cvid).getContext('2d')
+    @canvas = document.getElementById(cvid)
+    @surface = @canvas.getContext('2d')
+    @currentMapImage
 
   update : (x, y, type, name) ->
-    try
+    #try
       @surface.drawImage(Tile.images[type][name], x*CELL_SIZE, y*CELL_SIZE)
-    catch e
-      alert(type + ' ' + name)
+    #catch e
+     # alert(type + ' ' + name)
+
+  toDataUrl : ->
+    @currentMapImage = new Image()
+    @currentMapImage.src = @canvas.toDataURL('image/png')
+
+  resetWithMap : ->
+    @surface.drawImage(@currentMapImage, 0, 0)

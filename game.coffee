@@ -124,36 +124,22 @@
     ## Call the show method of the current map
     ## with monsters and the player set to it.
     #
-    drawStage : ->
+    drawObjects : ->
       map = @currentMap()
+      objectLayer = (0 for column in [0...map.width] for row in [0...map.height])
 
-      saveItemCell = []
       items = @itemStack[@level]
-      for i in [0...map._map.length]
+      for i in [0...map.height]
         for j, x of (if items[i]? then items[i] else [])
           if items[i]?[j]?.length
-            saveItemCell.push({x: j, y: i, save: map.getCell(j, i)})
-            map.setCell(j, i, ')') #items[i][j][0]) #first item in the pile
+            objectLayer[i][j] = items[i][j][0]
 
-      playerPos = @player.getPosition()
-      savePlayerCell = map.getCell(playerPos.x, playerPos.y)
-      map.setCell(playerPos.x, playerPos.y, '@')
+      pp = @player.getPosition()
+      objectLayer[pp.y][pp.x] = @player
 
-      saveMonsterCell = []
       for m in @monsterStack[@level]
         if m
           monsterPos = m.getPosition()
-          saveMonsterCell.push({x : monsterPos.x, y : monsterPos.y, save : map.getCell(monsterPos.x, monsterPos.y)})
-          map.setCell(monsterPos.x, monsterPos.y, m.char)
+          objectLayer[monsterPos.y][monsterPos.x] = m
 
-
-      ret = map.show()
-
-      map.setCell(playerPos.x, playerPos.y, savePlayerCell)
-      for s in saveMonsterCell
-        map.setCell(s.x, s.y, s.save)
-      for s in saveItemCell
-        console.log(s)
-        map.setCell(s.x, s.y, s.save)
-
-      ret
+      objectLayer

@@ -40,7 +40,10 @@ main  = ->
 #    console.log(e.which)
     keyChar = getKeyChar(e.which) #middleware wraps the keycode difference in each browser
 
-    direction = {'k' : 'u', 'j' : 'd', 'l' : 'r',  'h' : 'l'} #kjlh
+    direction = {
+      'k':'u', 'j':'d', 'l':'r',  'h':'l',
+      'y':'ul', 'u':'ur', 'b':'ll', 'n':'lr'
+    } #kjlh
     if direction[keyChar]
       game.player.walk(game.currentMap(),  direction[keyChar])
 
@@ -62,7 +65,11 @@ main  = ->
       )
       monster.on('die', (e) ->
         pos = e.beef.getPosition()
-        game.addItem(pos.x, pos.y, new Item(items.weapons[utils.randomInt(items.weapons.length)]...))
+        weapon = new Weapon(items.weapons[utils.randomInt(items.weapons.length)]...)
+        if weapon.rareness > utils.randomInt(100)
+          game.addItem(pos.x, pos.y, weapon)
+        else
+          weapon = null
       )
       game.addMonster(monster)
 
@@ -72,7 +79,7 @@ main  = ->
 
   game.on('turnend', ->
     #document.getElementById('jshack').innerHTML = game.drawStage() #activate when you want the text-mode
-    updateCanvas(game.drawStage()) #draw the current map on the canvas
+    updateObjects(game.drawObjects())
     status = [game.player.name, '@ floor -', game.level, '\n',
       'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time
     ].join(' ')
@@ -91,6 +98,7 @@ main  = ->
       game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
       game.nextMap()
     game.player.born(game.currentMap())
+    game.fire('mapchange')
   )
   game.on('godown', ->
     currentmonsterlist = (m for m in monsterlist when m[1] <= (((game.player.explevel or 1) + game.level)/2)) #NETHACK LOGIC
@@ -99,6 +107,7 @@ main  = ->
   game.on('goup', ->
     game.prevMap()
     game.player.born(game.currentMap())
+    game.fire('mapchange')
   )
   game.on('goup', ->
     currentmonsterlist = (m for m in monsterlist when m[1] <= ((game.player.explevel + game.level)/2 or 1)) #NETHACK LOGIC
@@ -127,6 +136,7 @@ main  = ->
     if [Map.TRAP, Map.TRAP_ACTIVE].indexOf(game.currentMap().getCell(e.position.x, e.position.y)) > -1
       pp = game.player.getPosition()
       game.currentMap().setCell(pp.x, pp.y, Map.TRAP_ACTIVE)
+      game.fire('mapchange')
       traplist[utils.randomInt(traplist.length)](game) #trap type is decided randomly on the fly
   )
 
@@ -139,8 +149,10 @@ main  = ->
         if getKeyChar(e.keyCode) is 'y'
           ninjitsu.jitsu(game)
           game.fire('message', {message : ninjitsu.message})
-          game.fire('turn')
           game.currentMap().setCell(ev.position.x, ev.position.y, Map.ROOM)
+          game.fire('mapchange')
+          game.fire('turn')
+
       document.addEventListener('keypress', listener)
   )
   game.player.on('explevelup', (e) ->
@@ -149,11 +161,12 @@ main  = ->
 
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
     '0').join('')
-  monstermap = {}
-  for m in monsterlist
-    monstermap[m[2]] = m[0]
 
-  updateCanvas = (mapstr) ->
+  game.on('mapchange', ->
+    updateCanvasMap(game.currentMap().show())
+  )
+
+  updateCanvasMap = (mapstr) ->
     mapstr = mapstr.replace(/\n/g, '')
     ptr = -1
     for i in [0...MAP_HEIGHT]
@@ -170,13 +183,19 @@ main  = ->
           when '<' then ['map', 'stair_up']
           when '>' then ['map', 'stair_down']
           when '*' then ['map', 'ninjitsu']
-          when '@' then ['monster', 'player']
-          when ')' then ['item', 'weapon']
-          else
-            ['monster', monstermap[mapstr[ptr]]]
-
         tile.update(j, i, cell[0], cell[1])
+    tile.toDataUrl()
 
+   updateObjects = (objectLayer) ->
+      tile.resetWithMap()
+      for i,row of objectLayer
+        for j, cell of row
+          if cell instanceof Player
+            tile.update(j, i, 'monster', cell.role)
+          else if cell instanceof Weapon
+            tile.update(j, i, 'weapon', cell.name)
+
+  updateCanvasMap(game.currentMap().show())
   game.fire('turn')
 
 getKeyChar = (keyCode) ->
