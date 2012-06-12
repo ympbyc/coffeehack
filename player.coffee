@@ -27,12 +27,12 @@
       @_position = {}
       @experience = 0
       @inventory = new Inventory()
-      @on('godown', ((e) ->
+      @on('godown', (e) =>
         e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
-      ).bind(@))
-      @on('goup', ((e) ->
+      )
+      @on('goup', (e) =>
         e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
-      ).bind(@))
+      )
 
     ## Generate a random coordinate, test it for its availability on the current map,
     ## if succeeds, reserve that cell
@@ -101,6 +101,7 @@
     #
     killedAnEnemy : (enemy) ->
       @experience += enemy.gainExp
+      @fire('killedanenemy')
       if @experience >= Player.EXP_REQUIRED[@explevel+1]
         @explevel += 1
         @dice[1] += 1

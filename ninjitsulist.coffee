@@ -11,7 +11,7 @@ ninjitsulist = [
     name : 'jistu of superattack',
     jitsu : ((game) ->
       pp = game.player.getPosition()
-      cells =  game.currentMap().getNearByCells(pp.x, pp.y)
+      cells =  game.currentMap().getNearbyReservations(pp.x, pp.y)
       m.hp = 0 for m in cells when m? and m),
     description : 'kills all the enemies on your nearby cells',
     message : 'Your nearby cells are cleared out! Yahoo!'

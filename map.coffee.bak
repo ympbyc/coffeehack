@@ -103,7 +103,7 @@
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
       f(Map.TRAP, utils.randomInt(10))
-      f(Map.NINJITSU, utils.randomInt(10+3))
+      f(Map.NINJITSU, utils.randomInt(10) + 3)
       map
 
     constructor : (@width, @height) ->

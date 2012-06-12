@@ -1,11 +1,10 @@
   #dep utils
 
   class Map
-    @EMPTY = 0
-    @PATH = 1
-    @ROOM = 2
-    @WALL_VERT = 3.1
-    @WALL_HORIZ = 3.2
+    @EARTH = 0
+    @WATER = 1
+    @FLOOR = 2
+    @WALL = 3
     @STAIR_UP = 4.1
     @STAIR_DOWN = 4.2
     @TRAP = 5
@@ -13,102 +12,82 @@
     @NINJITSU = 6
 
     ## create a two dimentional array representing the map.
-    ## prefill each cell with false
+    ## prefill each cell with earth
     #
-    initMap = (width, height) ->
-      map = for i in [0 ... height]
-        arr = for i in [0 ... width]
-          Map.EMPTY
+    _createEarth = (width, height) ->
+      (for i in [0 ... height]
+        (for j in [0 ... width]
+          Map.EARTH))
 
-    ## split the map recursively into sections.
-    ## this is probably the ugliest piece of code in this project.
-    #
-    splitMap = (map, splitMode) ->
-      map = map.concat([])
-      height = map.length
-      width = map[0].length
-      SPLIT_VERTICAL = 1
-      SPLIT_HORIZONTAL = 2
-      MINIMUM_LENGTH = 12
+    _singleRoomAtTheCentre : ->
+      centre = {x:@width/2, y:@height/2}
+      room = [[Map.WALL, Map.WALL, Map.WALL, Map.WALL, Map.WALL]
+              [Map.WALL, Map.FLOOR, Map.FLOOR, Map.FLOOR, Map.WALL]
+              [Map.WALL, Map.FLOOR, Map.FLOOR, Map.FLOOR, Map.WALL]
+              [Map.WALL, Map.FLOOR, Map.FLOOR, Map.FLOOR, Map.WALL]
+              [Map.WALL, Map.WALL, Map.WALL, Map.WALL, Map.WALL]]
+      @_addFeatureIfSpaceIsAvailable(centre, room, 'down')
 
-      ## When the section gets small enough, create a room in it and return
-      #
-      return createRoom(map) if width < MINIMUM_LENGTH or height < MINIMUM_LENGTH
+    _pickRandomStartingPoint : () ->
+      p = {x: utils.randomInt(@width), y: utils.randomInt(@height)}
+      nbc = @getNearbyCells(p.x, p.y)
+      if (@getCell(p.x,p.y) is Map.EARTH \
+         and (it for it in nbc when it is Map.WALL).length is 3)
+        if nbc[0] is Map.WALL then {coord:p, direction:'left'}
+        else if nbc[1] is Map.WALL then {coord:p, direction:'right'}
+        else if nbc[2] is Map.WALL then {coord:p, direction:'up'}
+        else if nbc[3] is Map.WALL then {coord:p, direction:'down'}
+        else
+          @_pickRandomStartingPoint()
+      else
+          @fail += 1
+          @_pickRandomStartingPoint()
 
-      splitMode = splitMode or Math.round(Math.random())
-
-      if splitMode is SPLIT_VERTICAL
-        xPosition = Math.round(Math.random()*(width-10)+5)
-
-        for i in [0 ... map.length] #initially 2
-          map[i][xPosition] = Map.PATH
-
-        leftHalf = []; rightHalf = []; splitColumn = []
-        for row in map
-          leftHalf.push(row[...xPosition])
-          rightHalf.push(row[xPosition+1..])
-          splitColumn.push([row[xPosition]])
-
-        leftResult = splitMap(leftHalf, SPLIT_HORIZONTAL)
-        rightResult = splitMap(rightHalf, SPLIT_HORIZONTAL)
-        finalResult = for i in [0 ... map.length]
-          leftResult[i].concat splitColumn[i].concat rightResult[i]
-        return finalResult
-
-      else if splitMode is SPLIT_HORIZONTAL
-        yPosition = Math.round(Math.random()*(height-10)+5)
-
-        for i in [0 ... map[yPosition].length] #initially 2
-          map[yPosition][i] = Map.PATH
-
-        upperHalf = map[0 ... yPosition]
-        lowerHalf = map[yPosition+1 ..]
-        splitRow = [map[yPosition]]
-
-        return splitMap(upperHalf, SPLIT_VERTICAL).concat splitRow.concat splitMap(lowerHalf, SPLIT_VERTICAL)
-
-    ## A room has the margin of 1 cell around it.
-    ## A cell in the centre of each wall is a room cell and from it a path piece extends to reach the section spilit line
-    ## which will be used as paths.
-    #
-    createRoom = (section) ->
-      return section if section.length < 5 or section[0].length < 5
-      section = section.concat([])
-      for i in [1 ... section.length-1]
-        for j in [1 ... section[i].length-1]
-          if i is 1 or i is section.length-2 then section[i][j] = Map.WALL_HORIZ
-          else if j is 1 or j is section[i].length-2 then section[i][j] = Map.WALL_VERT
-          else section[i][j] = Map.ROOM
-
-      vert_center = Math.floor(section.length / 2)
-      horiz_center = Math.floor(section[0].length / 2)
-
-      section[vert_center][0] = Map.PATH; section[vert_center][1] = Map.ROOM
-      section[vert_center][section[vert_center].length-1] = Map.PATH; section[vert_center][section[vert_center].length-2] = Map.ROOM
-      section[0][horiz_center] = Map.PATH; section[1][horiz_center] = Map.ROOM
-      section[section.length-1][horiz_center] = Map.PATH; section[section.length-2][horiz_center] = Map.ROOM;
-      section
+    _addFeatureIfSpaceIsAvailable : (p, feature, direction) ->
+      map = (cell for cell in row for row in @_map)
+      fwidth = feature[0].length; fheight = feature.length
+      mf = Math.floor
+      topleft = switch direction
+        when 'up' then {x: p.x-mf(fwidth/2), y: p.y-(fheight-1), tof:{x:p.x,y:p.y+1}}
+        when 'down' then {x: p.x-mf(fwidth/2), y: p.y, tof:{x:p.x,y:p.y-1}}
+        when 'left' then {x: p.x-(fwidth-1), y: p.y-mf(fheight/2), tof:{x:p.x+1,y:p.y}}
+        when 'right' then {x:p.x, y: p.y-mf(fheight/2), tof:{x:p.x-1,y:p.y}}
+      for y in [0...fheight]
+        for x in [0...fwidth]
+          return null if @getCell(x+topleft.x, y+topleft.y) isnt Map.EARTH
+          map[y+topleft.y][x+topleft.x] = feature[y][x]
+      map[p.y][p.x] = Map.FLOOR
+      map[topleft.tof.y][topleft.tof.x] = Map.FLOOR
+      @_map = map
 
     ## create special cells such as staircases, traps and ninjitsu fields
     #
-    createSpecialCells = (map) ->
-      map = map.concat([])
-      f = (type, occurance = 1) ->
+    _createSpecialCells : ->
+      f = (type, occurance = 1) =>
         if occurance
-          x = utils.randomInt(map[0].length); y = utils.randomInt(map.length)
-          if map[y][x] and map[y][x] is Map.ROOM
-            map[y][x] =  type
+          x = utils.randomInt(@width-1); y = utils.randomInt(@height-1)
+          if @_map[y][x] and @_map[y][x] is Map.FLOOR
+            @_map[y][x] =  type
             f(type, occurance -= 1)
           else f(type, occurance)
       f(Map.STAIR_UP)
       f(Map.STAIR_DOWN)
-      f(Map.TRAP, utils.randomInt(10))
-      f(Map.NINJITSU, utils.randomInt(10+3))
-      map
+      f(Map.TRAP, utils.randomInt(5))
+      f(Map.NINJITSU, 3)
+      @_map
 
     constructor : (@width, @height) ->
-      @_map = createSpecialCells(splitMap(initMap(@width, @height), 1))
+      @fail = 0
+      @_map = _createEarth(@width, @height)
+      @_singleRoomAtTheCentre()
+
+      lmt = 50
+      while --lmt
+        sttpt = @_pickRandomStartingPoint()
+        @_addFeatureIfSpaceIsAvailable(sttpt.coord, features[utils.randomInt(features.length)], sttpt.direction)
+      @_createSpecialCells()
       @reserved = []
+      console.log @fail
 
     ## build a string visualising the map.
     #
@@ -116,10 +95,10 @@
       str =  (for row in @_map
         (for cell in row
           switch cell
-            when Map.EMPTY then ' '
-            when Map.WALL_VERT then '|'
-            when Map.WALL_HORIZ then '-'
-            when Map.ROOM then '.'
+            when Map.EARTH then ' '
+            when Map.WATER then '~'
+            when Map.WALL then '-'
+            when Map.FLOOR then '.'
             when Map.TRAP then '.'
             when Map.TRAP_ACTIVE then '^'
             when Map.PATH then '#'
@@ -130,7 +109,7 @@
       ).join('\n')
       str
 
-    walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.NINJITSU]
+    walkable = [Map.FLOOR, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.NINJITSU]
 
     ## Checks for the cell type and reservation
     #
@@ -150,7 +129,23 @@
     ## Returns whatever is the cell set to
     #
     getCell : (x, y) ->
-      @_map[y][x]
+      if @_map[y]?[x]?
+        @_map[y][x]
+      else null
+
+    ##
+    #
+    getNearbyCells : (x, y) ->
+      [
+        @getCell(x+1, y),
+        @getCell(x-1, y),
+        @getCell(x, y+1),
+        @getCell(x, y-1),
+        @getCell(x+1, y+1),
+        @getCell(x+1, y-1),
+        @getCell(x-1, y+1),
+        @getCell(x-1, y-1)
+      ]
 
     ## Makes the cell exclusive to the object given.
     ## player and monsters should reserve a cell each time they move.
@@ -173,7 +168,7 @@
 
     ## Returns an array containing the reservation of surrounding 8 cells
     #
-    getNearByCells : (x, y) ->
+    getNearbyReservations : (x, y) ->
       [
         @getReservation(x+1, y),
         @getReservation(x-1, y),
