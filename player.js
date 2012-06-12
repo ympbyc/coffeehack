@@ -26,6 +26,7 @@ Player = (function(_super) {
 
 
   function Player(name, role, hp, explevel, gainExp, dice) {
+    var _this = this;
     this.name = name;
     this.role = role;
     this.hp = hp;
@@ -36,16 +37,16 @@ Player = (function(_super) {
     this._position = {};
     this.experience = 0;
     this.inventory = new Inventory();
-    this.on('godown', (function(e) {
+    this.on('godown', function(e) {
       if (e.prevMap) {
-        return e.prevMap.clearReservation(this.getPosition().x, this.getPosition().y);
+        return e.prevMap.clearReservation(_this.getPosition().x, _this.getPosition().y);
       }
-    }).bind(this));
-    this.on('goup', (function(e) {
+    });
+    this.on('goup', function(e) {
       if (e.prevMap) {
-        return e.prevMap.clearReservation(this.getPosition().x, this.getPosition().y);
+        return e.prevMap.clearReservation(_this.getPosition().x, _this.getPosition().y);
       }
-    }).bind(this));
+    });
   }
 
   Player.prototype.born = function(map) {
@@ -142,6 +143,7 @@ Player = (function(_super) {
 
   Player.prototype.killedAnEnemy = function(enemy) {
     this.experience += enemy.gainExp;
+    this.fire('killedanenemy');
     if (this.experience >= Player.EXP_REQUIRED[this.explevel + 1]) {
       this.explevel += 1;
       this.dice[1] += 1;

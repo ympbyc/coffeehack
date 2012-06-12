@@ -2,17 +2,15 @@
 var Map;
 
 Map = (function() {
-  var createRoom, createSpecialCells, initMap, splitMap, walkable;
+  var walkable, _createEarth;
 
-  Map.EMPTY = 0;
+  Map.EARTH = 0;
 
-  Map.PATH = 1;
+  Map.WATER = 1;
 
-  Map.ROOM = 2;
+  Map.FLOOR = 2;
 
-  Map.WALL_VERT = 3.1;
-
-  Map.WALL_HORIZ = 3.2;
+  Map.WALL = 3;
 
   Map.STAIR_UP = 4.1;
 
@@ -24,117 +22,168 @@ Map = (function() {
 
   Map.NINJITSU = 6;
 
-  initMap = function(width, height) {
-    var arr, i, map;
-    return map = (function() {
-      var _i, _results;
+  _createEarth = function(width, height) {
+    var i, j, _i, _results;
+    _results = [];
+    for (i = _i = 0; 0 <= height ? _i < height : _i > height; i = 0 <= height ? ++_i : --_i) {
+      _results.push((function() {
+        var _j, _results1;
+        _results1 = [];
+        for (j = _j = 0; 0 <= width ? _j < width : _j > width; j = 0 <= width ? ++_j : --_j) {
+          _results1.push(Map.EARTH);
+        }
+        return _results1;
+      })());
+    }
+    return _results;
+  };
+
+  Map.prototype._singleRoomAtTheCentre = function() {
+    var centre, room;
+    centre = {
+      x: this.width / 2,
+      y: this.height / 2
+    };
+    room = [[Map.WALL, Map.WALL, Map.WALL, Map.WALL, Map.WALL], [Map.WALL, Map.FLOOR, Map.FLOOR, Map.FLOOR, Map.WALL], [Map.WALL, Map.FLOOR, Map.FLOOR, Map.FLOOR, Map.WALL], [Map.WALL, Map.FLOOR, Map.FLOOR, Map.FLOOR, Map.WALL], [Map.WALL, Map.WALL, Map.WALL, Map.WALL, Map.WALL]];
+    return this._addFeatureIfSpaceIsAvailable(centre, room, 'down');
+  };
+
+  Map.prototype._pickRandomStartingPoint = function() {
+    var it, nbc, p;
+    p = {
+      x: utils.randomInt(this.width),
+      y: utils.randomInt(this.height)
+    };
+    nbc = this.getNearbyCells(p.x, p.y);
+    if (this.getCell(p.x, p.y) === Map.EARTH && ((function() {
+      var _i, _len, _results;
       _results = [];
-      for (i = _i = 0; 0 <= height ? _i < height : _i > height; i = 0 <= height ? ++_i : --_i) {
-        _results.push(arr = (function() {
-          var _j, _results1;
+      for (_i = 0, _len = nbc.length; _i < _len; _i++) {
+        it = nbc[_i];
+        if (it === Map.WALL) {
+          _results.push(it);
+        }
+      }
+      return _results;
+    })()).length === 3) {
+      if (nbc[0] === Map.WALL) {
+        return {
+          coord: p,
+          direction: 'left'
+        };
+      } else if (nbc[1] === Map.WALL) {
+        return {
+          coord: p,
+          direction: 'right'
+        };
+      } else if (nbc[2] === Map.WALL) {
+        return {
+          coord: p,
+          direction: 'up'
+        };
+      } else if (nbc[3] === Map.WALL) {
+        return {
+          coord: p,
+          direction: 'down'
+        };
+      } else {
+        return this._pickRandomStartingPoint();
+      }
+    } else {
+      this.fail += 1;
+      return this._pickRandomStartingPoint();
+    }
+  };
+
+  Map.prototype._addFeatureIfSpaceIsAvailable = function(p, feature, direction) {
+    var cell, fheight, fwidth, map, mf, row, topleft, x, y, _i, _j;
+    map = (function() {
+      var _i, _len, _ref, _results;
+      _ref = this._map;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        row = _ref[_i];
+        _results.push((function() {
+          var _j, _len1, _results1;
           _results1 = [];
-          for (i = _j = 0; 0 <= width ? _j < width : _j > width; i = 0 <= width ? ++_j : --_j) {
-            _results1.push(Map.EMPTY);
+          for (_j = 0, _len1 = row.length; _j < _len1; _j++) {
+            cell = row[_j];
+            _results1.push(cell);
           }
           return _results1;
         })());
       }
       return _results;
+    }).call(this);
+    fwidth = feature[0].length;
+    fheight = feature.length;
+    mf = Math.floor;
+    topleft = (function() {
+      switch (direction) {
+        case 'up':
+          return {
+            x: p.x - mf(fwidth / 2),
+            y: p.y - (fheight - 1),
+            tof: {
+              x: p.x,
+              y: p.y + 1
+            }
+          };
+        case 'down':
+          return {
+            x: p.x - mf(fwidth / 2),
+            y: p.y,
+            tof: {
+              x: p.x,
+              y: p.y - 1
+            }
+          };
+        case 'left':
+          return {
+            x: p.x - (fwidth - 1),
+            y: p.y - mf(fheight / 2),
+            tof: {
+              x: p.x + 1,
+              y: p.y
+            }
+          };
+        case 'right':
+          return {
+            x: p.x,
+            y: p.y - mf(fheight / 2),
+            tof: {
+              x: p.x - 1,
+              y: p.y
+            }
+          };
+      }
     })();
-  };
-
-  splitMap = function(map, splitMode) {
-    var MINIMUM_LENGTH, SPLIT_HORIZONTAL, SPLIT_VERTICAL, finalResult, height, i, leftHalf, leftResult, lowerHalf, rightHalf, rightResult, row, splitColumn, splitRow, upperHalf, width, xPosition, yPosition, _i, _j, _k, _len, _ref, _ref1;
-    map = map.concat([]);
-    height = map.length;
-    width = map[0].length;
-    SPLIT_VERTICAL = 1;
-    SPLIT_HORIZONTAL = 2;
-    MINIMUM_LENGTH = 12;
-    if (width < MINIMUM_LENGTH || height < MINIMUM_LENGTH) {
-      return createRoom(map);
-    }
-    splitMode = splitMode || Math.round(Math.random());
-    if (splitMode === SPLIT_VERTICAL) {
-      xPosition = Math.round(Math.random() * (width - 10) + 5);
-      for (i = _i = 0, _ref = map.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-        map[i][xPosition] = Map.PATH;
-      }
-      leftHalf = [];
-      rightHalf = [];
-      splitColumn = [];
-      for (_j = 0, _len = map.length; _j < _len; _j++) {
-        row = map[_j];
-        leftHalf.push(row.slice(0, xPosition));
-        rightHalf.push(row.slice(xPosition + 1));
-        splitColumn.push([row[xPosition]]);
-      }
-      leftResult = splitMap(leftHalf, SPLIT_HORIZONTAL);
-      rightResult = splitMap(rightHalf, SPLIT_HORIZONTAL);
-      finalResult = (function() {
-        var _k, _ref1, _results;
-        _results = [];
-        for (i = _k = 0, _ref1 = map.length; 0 <= _ref1 ? _k < _ref1 : _k > _ref1; i = 0 <= _ref1 ? ++_k : --_k) {
-          _results.push(leftResult[i].concat(splitColumn[i].concat(rightResult[i])));
+    for (y = _i = 0; 0 <= fheight ? _i < fheight : _i > fheight; y = 0 <= fheight ? ++_i : --_i) {
+      for (x = _j = 0; 0 <= fwidth ? _j < fwidth : _j > fwidth; x = 0 <= fwidth ? ++_j : --_j) {
+        if (this.getCell(x + topleft.x, y + topleft.y) !== Map.EARTH) {
+          return null;
         }
-        return _results;
-      })();
-      return finalResult;
-    } else if (splitMode === SPLIT_HORIZONTAL) {
-      yPosition = Math.round(Math.random() * (height - 10) + 5);
-      for (i = _k = 0, _ref1 = map[yPosition].length; 0 <= _ref1 ? _k < _ref1 : _k > _ref1; i = 0 <= _ref1 ? ++_k : --_k) {
-        map[yPosition][i] = Map.PATH;
-      }
-      upperHalf = map.slice(0, yPosition);
-      lowerHalf = map.slice(yPosition + 1);
-      splitRow = [map[yPosition]];
-      return splitMap(upperHalf, SPLIT_VERTICAL).concat(splitRow.concat(splitMap(lowerHalf, SPLIT_VERTICAL)));
-    }
-  };
-
-  createRoom = function(section) {
-    var horiz_center, i, j, vert_center, _i, _j, _ref, _ref1;
-    if (section.length < 5 || section[0].length < 5) {
-      return section;
-    }
-    section = section.concat([]);
-    for (i = _i = 1, _ref = section.length - 1; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
-      for (j = _j = 1, _ref1 = section[i].length - 1; 1 <= _ref1 ? _j < _ref1 : _j > _ref1; j = 1 <= _ref1 ? ++_j : --_j) {
-        if (i === 1 || i === section.length - 2) {
-          section[i][j] = Map.WALL_HORIZ;
-        } else if (j === 1 || j === section[i].length - 2) {
-          section[i][j] = Map.WALL_VERT;
-        } else {
-          section[i][j] = Map.ROOM;
-        }
+        map[y + topleft.y][x + topleft.x] = feature[y][x];
       }
     }
-    vert_center = Math.floor(section.length / 2);
-    horiz_center = Math.floor(section[0].length / 2);
-    section[vert_center][0] = Map.PATH;
-    section[vert_center][1] = Map.ROOM;
-    section[vert_center][section[vert_center].length - 1] = Map.PATH;
-    section[vert_center][section[vert_center].length - 2] = Map.ROOM;
-    section[0][horiz_center] = Map.PATH;
-    section[1][horiz_center] = Map.ROOM;
-    section[section.length - 1][horiz_center] = Map.PATH;
-    section[section.length - 2][horiz_center] = Map.ROOM;
-    return section;
+    map[p.y][p.x] = Map.FLOOR;
+    map[topleft.tof.y][topleft.tof.x] = Map.FLOOR;
+    return this._map = map;
   };
 
-  createSpecialCells = function(map) {
-    var f;
-    map = map.concat([]);
+  Map.prototype._createSpecialCells = function() {
+    var f,
+      _this = this;
     f = function(type, occurance) {
       var x, y;
       if (occurance == null) {
         occurance = 1;
       }
       if (occurance) {
-        x = utils.randomInt(map[0].length);
-        y = utils.randomInt(map.length);
-        if (map[y][x] && map[y][x] === Map.ROOM) {
-          map[y][x] = type;
+        x = utils.randomInt(_this.width - 1);
+        y = utils.randomInt(_this.height - 1);
+        if (_this._map[y][x] && _this._map[y][x] === Map.FLOOR) {
+          _this._map[y][x] = type;
           return f(type, occurance -= 1);
         } else {
           return f(type, occurance);
@@ -143,16 +192,26 @@ Map = (function() {
     };
     f(Map.STAIR_UP);
     f(Map.STAIR_DOWN);
-    f(Map.TRAP, utils.randomInt(10));
-    f(Map.NINJITSU, utils.randomInt(10 + 3));
-    return map;
+    f(Map.TRAP, utils.randomInt(5));
+    f(Map.NINJITSU, 3);
+    return this._map;
   };
 
   function Map(width, height) {
+    var lmt, sttpt;
     this.width = width;
     this.height = height;
-    this._map = createSpecialCells(splitMap(initMap(this.width, this.height), 1));
+    this.fail = 0;
+    this._map = _createEarth(this.width, this.height);
+    this._singleRoomAtTheCentre();
+    lmt = 50;
+    while (--lmt) {
+      sttpt = this._pickRandomStartingPoint();
+      this._addFeatureIfSpaceIsAvailable(sttpt.coord, features[utils.randomInt(features.length)], sttpt.direction);
+    }
+    this._createSpecialCells();
     this.reserved = [];
+    console.log(this.fail);
   }
 
   Map.prototype.show = function() {
@@ -169,16 +228,16 @@ Map = (function() {
           for (_j = 0, _len1 = row.length; _j < _len1; _j++) {
             cell = row[_j];
             switch (cell) {
-              case Map.EMPTY:
+              case Map.EARTH:
                 _results1.push(' ');
                 break;
-              case Map.WALL_VERT:
-                _results1.push('|');
+              case Map.WATER:
+                _results1.push('~');
                 break;
-              case Map.WALL_HORIZ:
+              case Map.WALL:
                 _results1.push('-');
                 break;
-              case Map.ROOM:
+              case Map.FLOOR:
                 _results1.push('.');
                 break;
               case Map.TRAP:
@@ -211,7 +270,7 @@ Map = (function() {
     return str;
   };
 
-  walkable = [Map.ROOM, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.NINJITSU];
+  walkable = [Map.FLOOR, Map.PATH, Map.STAIR_UP, Map.STAIR_DOWN, Map.TRAP, Map.TRAP_ACTIVE, Map.NINJITSU];
 
   Map.prototype.isWalkable = function(x, y) {
     return this._map[y] && this._map[y][x] && walkable.indexOf(this._map[y][x]) > -1 && !this.getReservation(x, y);
@@ -226,7 +285,16 @@ Map = (function() {
   };
 
   Map.prototype.getCell = function(x, y) {
-    return this._map[y][x];
+    var _ref;
+    if (((_ref = this._map[y]) != null ? _ref[x] : void 0) != null) {
+      return this._map[y][x];
+    } else {
+      return null;
+    }
+  };
+
+  Map.prototype.getNearbyCells = function(x, y) {
+    return [this.getCell(x + 1, y), this.getCell(x - 1, y), this.getCell(x, y + 1), this.getCell(x, y - 1), this.getCell(x + 1, y + 1), this.getCell(x + 1, y - 1), this.getCell(x - 1, y + 1), this.getCell(x - 1, y - 1)];
   };
 
   Map.prototype.reserveCell = function(x, y, obj) {
@@ -252,7 +320,7 @@ Map = (function() {
     return this.reserved[y][x] = null;
   };
 
-  Map.prototype.getNearByCells = function(x, y) {
+  Map.prototype.getNearbyReservations = function(x, y) {
     return [this.getReservation(x + 1, y), this.getReservation(x - 1, y), this.getReservation(x, y + 1), this.getReservation(x, y - 1), this.getReservation(x + 1, y + 1), this.getReservation(x - 1, y + 1), this.getReservation(x + 1, y - 1), this.getReservation(x - 1, y - 1)];
   };
 

@@ -8,18 +8,20 @@ Game = (function(_super) {
   __extends(Game, _super);
 
   function Game() {
+    var _this = this;
     Game.__super__.constructor.call(this);
     this.monsterStack = [[]];
     this.itemStack = [[]];
     this.mapStack = [];
     this.level = -1;
     this.time = 0;
-    this.on('turn', (function() {
-      return this.turnInit();
-    }).bind(this));
-    this.on('turnend', (function() {
-      return this.turnEnd();
-    }).bind(this));
+    this.score = 0;
+    this.on('turn', function() {
+      return _this.turnInit();
+    });
+    this.on('turnend', function() {
+      return _this.turnEnd();
+    });
   }
 
   Game.prototype.setPlayer = function(player) {

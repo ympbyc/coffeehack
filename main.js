@@ -109,7 +109,7 @@ main = function() {
   game.on('turnend', function() {
     var status;
     updateObjects(game.drawObjects());
-    status = [game.player.name, '@ floor -', game.level, '\n', 'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience * 10) * 1 / 10, 'time:', game.time].join(' ');
+    status = [game.player.name, '@ floor -', game.level, '\n', 'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience * 10) * 1 / 10, 'time:', game.time, 'score:', game.score].join(' ');
     return game.fire('status', {
       status: status
     });
@@ -205,7 +205,7 @@ main = function() {
           game.fire('message', {
             message: ninjitsu.message
           });
-          game.currentMap().setCell(ev.position.x, ev.position.y, Map.ROOM);
+          game.currentMap().setCell(ev.position.x, ev.position.y, Map.FLOOR);
           game.fire('mapchange');
           return game.fire('turn');
         }
@@ -214,9 +214,13 @@ main = function() {
     }
   });
   game.player.on('explevelup', function(e) {
+    game.score += 100;
     return game.fire('message', {
       message: "Welcome to experience level " + e.explevel + "."
     });
+  });
+  game.player.on('killedanenemy', function() {
+    return game.score += 100;
   });
   prevmapstr = ((function() {
     var _i, _ref, _results;
@@ -243,6 +247,8 @@ main = function() {
           switch (mapstr[ptr]) {
             case ' ':
               return ['map', 'blank'];
+            case '~':
+              return ['map', 'water'];
             case '.':
               return ['map', 'room'];
             case '#':

@@ -21,6 +21,7 @@ Tile = (function() {
     return {
       map: {
         blank: loadImage(829),
+        water: loadImage(860),
         room: loadImage(849),
         path: loadImage(850),
         wall_vert: loadImage(830),

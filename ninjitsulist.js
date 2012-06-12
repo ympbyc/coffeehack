@@ -14,7 +14,7 @@ ninjitsulist = [
     jitsu: (function(game) {
       var cells, m, pp, _i, _len, _results;
       pp = game.player.getPosition();
-      cells = game.currentMap().getNearByCells(pp.x, pp.y);
+      cells = game.currentMap().getNearbyReservations(pp.x, pp.y);
       _results = [];
       for (_i = 0, _len = cells.length; _i < _len; _i++) {
         m = cells[_i];
