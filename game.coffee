@@ -8,12 +8,13 @@
       @mapStack = []
       @level = -1
       @time = 0
-      @on('turn', (->
+      @score = 0
+      @on('turn', =>
         @turnInit()
-      ).bind(@))
-      @on('turnend', (->
+      )
+      @on('turnend', =>
         @turnEnd()
-      ).bind(@))
+      )
 
     ## set the player of the game.
     ## coffeehack is a single player game so this method

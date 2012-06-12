@@ -81,7 +81,7 @@ main  = ->
     #document.getElementById('jshack').innerHTML = game.drawStage() #activate when you want the text-mode
     updateObjects(game.drawObjects())
     status = [game.player.name, '@ floor -', game.level, '\n',
-      'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time
+      'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time, 'score:', game.score
     ].join(' ')
     game.fire('status', {status : status}) #writes out the status line at the botttom
   )
@@ -149,14 +149,18 @@ main  = ->
         if getKeyChar(e.keyCode) is 'y'
           ninjitsu.jitsu(game)
           game.fire('message', {message : ninjitsu.message})
-          game.currentMap().setCell(ev.position.x, ev.position.y, Map.ROOM)
+          game.currentMap().setCell(ev.position.x, ev.position.y, Map.FLOOR)
           game.fire('mapchange')
           game.fire('turn')
 
       document.addEventListener('keypress', listener)
   )
   game.player.on('explevelup', (e) ->
+    game.score += 100
     game.fire('message', {message : "Welcome to experience level #{e.explevel}."})
+  )
+  game.player.on('killedanenemy', ->
+    game.score += 100
   )
 
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
@@ -175,6 +179,7 @@ main  = ->
         if prevmapstr[ptr] is mapstr[ptr] then continue
         cell = switch mapstr[ptr]
           when ' ' then ['map', 'blank']
+          when '~' then ['map', 'water']
           when '.' then ['map', 'room']
           when '#' then ['map', 'path']
           when '|' then ['map', 'wall_vert']
@@ -200,7 +205,6 @@ main  = ->
 
 getKeyChar = (keyCode) ->
   String.fromCharCode(keyCode)
-
 
 unless Function::bind
   Function::bind = (oThis) ->
