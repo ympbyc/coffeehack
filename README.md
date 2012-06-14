@@ -4,13 +4,17 @@ coffeehack is a classic roguelike game written using coffeescript.
 It runs on the latest web browsers which support html5 canvas.
 
 key-binding
+
       direction keys
+      
       y k u
        ↖↑↗
       h←.→l
        ↙↓↘
       b j n
-        
+      
+      other commands
+      
       ; - eximine the cell you are on
       , - pick up an item
       i - show the inventory
