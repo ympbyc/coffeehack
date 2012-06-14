@@ -19,6 +19,9 @@
         (for j in [0 ... width]
           Map.EARTH))
 
+    ## we need some walls in order to build features.
+    ## creating a small room at the center would do the job.
+    #
     _singleRoomAtTheCentre : ->
       centre = {x:@width/2, y:@height/2}
       room = [[Map.WALL, Map.WALL, Map.WALL, Map.WALL, Map.WALL]
@@ -28,6 +31,10 @@
               [Map.WALL, Map.WALL, Map.WALL, Map.WALL, Map.WALL]]
       @_addFeatureIfSpaceIsAvailable(centre, room, 'down')
 
+    ## pick a random coordinate
+    ## check if it is empty and is next to a wall cell
+    ## if so return that coordinate and the direction which the feature should be added
+    #
     _pickRandomStartingPoint : () ->
       p = {x: utils.randomInt(@width), y: utils.randomInt(@height)}
       nbc = @getNearbyCells(p.x, p.y)
@@ -43,6 +50,11 @@
           @fail += 1
           @_pickRandomStartingPoint()
 
+    ## add the given feature to the map
+    ## we accomplish this by actually filling the deep copyied array of the map
+    ## just return if we encounter a non-empty cell on the way
+    ## otherwise replace the map with this new map with the feature added
+    #
     _addFeatureIfSpaceIsAvailable : (p, feature, direction) ->
       map = (cell for cell in row for row in @_map)
       fwidth = feature[0].length; fheight = feature.length
