@@ -221,4 +221,4 @@ unless Function::bind
     fBound
 
 
-#window.addEventListener('load', main)
+window.addEventListener('load', main)
