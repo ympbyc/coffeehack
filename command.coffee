@@ -46,4 +46,24 @@ commands = {
       item = game.player.inventory.removeItem(ch)
       console.log(item)
       game.addItem(pp.x, pp.y, item)
+      null
+
+  'A' : (game) ->
+    map = game.currentMap._map;
+    dstcs = (->
+      for j, cell of row for i, row of map
+        return {x:j, y:i} if cell is Map.STAIR_DOWN)()
+    pp = game.player.getPosition()
+    if map.getCell(pp.x, pp.y) is Map.STAIR_DOWN then commands['>'](game)
+    if pp.x < dstcs.x && (map.isWalkable(pp.x+1, pp.y) || map.isAttackable(pp.x+1, pp.y))
+      game.player.walk('l')
+    else if pp.x > dstcs.x && (map.isWalkable(pp.x-1, pp.y) || map.isAttackable(pp.x-1, pp.y))
+      game.player.walk('h')
+    else if pp.y < dstcs.y &&  (map.isWalkable(pp.x, pp.y+1) || map.isAttackable(pp.x, pp.y+1))
+      game.player.walk('j')
+    else if pp.y > dstcs.y &&  (map.isWalkable(pp.x, pp.y-1) || map.isAttackable(pp.x, pp.y-1))
+      game.player.walk('k')
+    else
+      game.player.walk(['h','j','k','l'][utils.randomInt(4)])
+    setTimeout((->commands['A'](game)), 500)
 }
