@@ -47,7 +47,6 @@
         else
           @_pickRandomStartingPoint()
       else
-          @fail += 1
           @_pickRandomStartingPoint()
 
     ## add the given feature to the map
@@ -75,21 +74,22 @@
     ## create special cells such as staircases, traps and ninjitsu fields
     #
     _createSpecialCells : ->
-      f = (type, occurance = 1) =>
+      f = (type, occurance = 1, memo) =>
         if occurance
           x = utils.randomInt(@width-1); y = utils.randomInt(@height-1)
           if @_map[y][x] and @_map[y][x] is Map.FLOOR
             @_map[y][x] =  type
-            f(type, occurance -= 1)
+            f(type, occurance -= 1, {x:x,y:y})
           else f(type, occurance)
-      f(Map.STAIR_UP)
-      f(Map.STAIR_DOWN)
+        else
+          memo
+      @stair_pos_up = f(Map.STAIR_UP)
+      @stair_pos_down = f(Map.STAIR_DOWN)
       f(Map.TRAP, utils.randomInt(5))
       f(Map.NINJITSU, 3)
       @_map
 
     constructor : (@width, @height) ->
-      @fail = 0
       @_map = _createEarth(@width, @height)
       @_singleRoomAtTheCentre()
 
@@ -97,9 +97,9 @@
       while --lmt
         sttpt = @_pickRandomStartingPoint()
         @_addFeatureIfSpaceIsAvailable(sttpt.coord, features[utils.randomInt(features.length)], sttpt.direction)
+      @stair_pos_up = null; @stair_pos_down = null
       @_createSpecialCells()
       @reserved = []
-      console.log @fail
 
     ## build a string visualising the map.
     #
@@ -176,7 +176,7 @@
     ## Make the cell available for others
     #
     clearReservation : (x, y) ->
-      @reserved[y][x] = null
+      @reserved[y][x] = null if @reserved[y]?[x]?
 
     ## Returns an array containing the reservation of surrounding 8 cells
     #

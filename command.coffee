@@ -48,22 +48,53 @@ commands = {
       game.addItem(pp.x, pp.y, item)
       null
 
-  'A' : (game) ->
-    map = game.currentMap._map;
+  'x' : (game, tothisdir=null) ->
+    if game.player.isDead() then game.player.hp = 100
+    console.log tothisdir
+    map = game.currentMap()
     dstcs = (->
-      for j, cell of row for i, row of map
-        return {x:j, y:i} if cell is Map.STAIR_DOWN)()
+      for i in [0...map._map.length]
+        for j in [0...map._map[i].length]
+          return {x:j, y:i} if map.getCell(j, i) is Map.STAIR_DOWN
+    )()
+
+    isOkToGo = (x, y) ->
+      if map.isWalkable(x, y) or map.isAttackable(x, y) then true
+      else false
+
     pp = game.player.getPosition()
+    rnd = !(utils.randomInt(10) < 3)
+    nbc = map.getNearbyCells()
     if map.getCell(pp.x, pp.y) is Map.STAIR_DOWN then commands['>'](game)
-    if pp.x < dstcs.x && (map.isWalkable(pp.x+1, pp.y) || map.isAttackable(pp.x+1, pp.y))
-      game.player.walk('l')
-    else if pp.x > dstcs.x && (map.isWalkable(pp.x-1, pp.y) || map.isAttackable(pp.x-1, pp.y))
-      game.player.walk('h')
-    else if pp.y < dstcs.y &&  (map.isWalkable(pp.x, pp.y+1) || map.isAttackable(pp.x, pp.y+1))
-      game.player.walk('j')
-    else if pp.y > dstcs.y &&  (map.isWalkable(pp.x, pp.y-1) || map.isAttackable(pp.x, pp.y-1))
-      game.player.walk('k')
+    else if (tothisdir and (
+          (tothisdir is 'u' and isOkToGo(pp.x, pp.y-1)) or
+          (tothisdir is 'd' and isOkToGo(pp.x, pp.y+1)) or
+          (tothisdir is 'l' and isOkToGo(pp.x-1, pp.y)) or
+          (tothisdir is 'r' and isOkToGo(pp.x+1, pp.y))
+       )) and utils.randomInt(10) > 3
+         ttd = tothisdir
+         game.player.walk(map, tothisdir)
+    else if pp.x < dstcs.x && isOkToGo(pp.x+1, pp.y) and utils.randomInt(10) > 4
+      game.player.walk(map, 'r')
+    else if pp.y < dstcs.y &&  isOkToGo(pp.x, pp.y+1) and utils.randomInt(10) > 4
+      game.player.walk(map, 'd')
+    else if pp.x > dstcs.x && isOkToGo(pp.x-1, pp.y) and utils.randomInt(10) > 4
+      game.player.walk(map, 'l')
+    else if pp.y > dstcs.y &&  isOkToGo(pp.x, pp.y-1)  and utils.randomInt(10) > 4
+      game.player.walk(map, 'u')
     else
-      game.player.walk(['h','j','k','l'][utils.randomInt(4)])
-    setTimeout((->commands['A'](game)), 500)
+        ttd = null
+        f = ->
+          d= [{d:'r', x:pp.x+1, y:pp.y},
+           {d:'l', x:pp.x-1, y:pp.y},
+           {d:'d', x:pp.x, y:pp.y+1},
+           {d:'u', x:pp.x, y:pp.y-1}
+          ][utils.randomInt(4)]
+          if isOkToGo(d.x, d.y)
+            game.player.walk(map, d.d)
+            ttd = d.d
+          else f()
+        f()
+    game.fire('turn')
+    setTimeout((->commands['x'](game, ttd)), 80)
 }

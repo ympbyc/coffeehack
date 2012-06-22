@@ -23,25 +23,9 @@
     <script src="main.js"></script>
     
     <style type="text/css">
-      #mainwrapper {
-       width : 900px;
-       margin : 0 auto;
-      }
       body {
         font-size : 12px;
         font-family : "Courier", monospace;
-      }
-      #ch-canvas {
-        float : left;
-      }
-      .meswrapper {
-        float : left;
-        height : 480px;
-        overflow : scroll;
-      }
-      .statwrapper {
-        float : left;
-        width : 100%;
       }
       #jshack {
         float : right;
@@ -49,17 +33,14 @@
       h1 {
         font-size : 1.1em;
       }
-      #help {
-        width : 100%;
-      }
     </style>
   </head>
   <body>
     <div id="mainwrapper">
+      <pre id="message"></pre>
       <canvas id="ch-canvas" width="640" height="480"></canvas>
-      <div class="meswrapper"><pre id="message"></pre></div>
       <!--<pre id="jshack"></pre>-->
-      <div class="statwrapper"><pre id="status"></pre></div>
+      <pre id="status"></pre>
       
       <hr/>
       

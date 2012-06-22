@@ -38,11 +38,12 @@
     ## if succeeds, reserve that cell
     ## if not, try again
     #
-    born : (map) ->
-      nextPos = {
-        x : Math.floor(Math.random()*map.width)
-        y : Math.floor(Math.random()*map.height)
-      }
+    born : (map, pos=null) ->
+      nextPos = if pos? then pos else
+        {
+          x : Math.floor(Math.random()*map.width)
+          y : Math.floor(Math.random()*map.height)
+        }
       if map.isWalkable(nextPos.x, nextPos.y)
         @_position = nextPos
         map.reserveCell(@_position.x, @_position.y, @)
