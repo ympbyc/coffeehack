@@ -49,9 +49,12 @@ Player = (function(_super) {
     });
   }
 
-  Player.prototype.born = function(map) {
+  Player.prototype.born = function(map, pos) {
     var nextPos;
-    nextPos = {
+    if (pos == null) {
+      pos = null;
+    }
+    nextPos = pos != null ? pos : {
       x: Math.floor(Math.random() * map.width),
       y: Math.floor(Math.random() * map.height)
     };

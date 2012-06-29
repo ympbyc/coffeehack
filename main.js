@@ -44,7 +44,7 @@ main = function() {
     }
     return _results;
   })();
-  message = ['', ' The following is written in a secret scroll you inherited from your ancestor.', '  "There once were mean dragons crawling all around us on the ground', '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."', 'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!'];
+  message = ['', ' ', ' ', ' ', 'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!'];
   $(document).on('keypress', function(e) {
     var direction, f, keyChar;
     keyChar = getKeyChar(e.which);
@@ -122,11 +122,13 @@ main = function() {
     }
   });
   game.on('godown', function() {
+    var map;
     if (!game.nextMap()) {
       game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT));
       game.nextMap();
     }
-    game.player.born(game.currentMap());
+    map = game.currentMap();
+    game.player.born(map, map.stair_pos_up);
     return game.fire('mapchange');
   });
   game.on('godown', function() {
@@ -144,8 +146,10 @@ main = function() {
     return console.log(currentmonsterlist);
   });
   game.on('goup', function() {
+    var map;
     game.prevMap();
-    game.player.born(game.currentMap());
+    map = game.currentMap();
+    game.player.born(map, map.stair_pos_down);
     return game.fire('mapchange');
   });
   game.on('goup', function() {
@@ -321,3 +325,5 @@ if (!Function.prototype.bind) {
     return fBound;
   };
 }
+
+window.addEventListener('load', main);

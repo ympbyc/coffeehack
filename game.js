@@ -154,10 +154,7 @@ Game = (function(_super) {
   };
 
   Game.prototype.turnEnd = function() {
-    this.killMonsters();
-    if (this.player.isDead()) {
-      return alert('you died');
-    }
+    return this.killMonsters();
   };
 
   Game.prototype.drawObjects = function() {

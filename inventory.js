@@ -7,7 +7,7 @@ Inventory = (function(_super) {
 
   __extends(Inventory, _super);
 
-  Inventory.validchars = ['a', 'b', 'c'];
+  Inventory.validchars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'];
 
   function Inventory() {
     Inventory.__super__.constructor.call(this);

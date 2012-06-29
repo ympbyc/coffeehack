@@ -91,7 +91,91 @@ commands = {
       var item;
       item = game.player.inventory.removeItem(ch);
       console.log(item);
-      return game.addItem(pp.x, pp.y, item);
+      game.addItem(pp.x, pp.y, item);
+      return null;
     };
+  },
+  'x': function(game, tothisdir) {
+    var dstcs, f, isOkToGo, map, nbc, pp, rnd, ttd;
+    if (tothisdir == null) {
+      tothisdir = null;
+    }
+    if (game.player.isDead()) {
+      game.player.hp = 100;
+    }
+    console.log(tothisdir);
+    map = game.currentMap();
+    dstcs = (function() {
+      var i, j, _i, _j, _ref, _ref1;
+      for (i = _i = 0, _ref = map._map.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        for (j = _j = 0, _ref1 = map._map[i].length; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
+          if (map.getCell(j, i) === Map.STAIR_DOWN) {
+            return {
+              x: j,
+              y: i
+            };
+          }
+        }
+      }
+    })();
+    isOkToGo = function(x, y) {
+      if (map.isWalkable(x, y) || map.isAttackable(x, y)) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+    pp = game.player.getPosition();
+    rnd = !(utils.randomInt(10) < 3);
+    nbc = map.getNearbyCells();
+    if (map.getCell(pp.x, pp.y) === Map.STAIR_DOWN) {
+      commands['>'](game);
+    } else if ((tothisdir && ((tothisdir === 'u' && isOkToGo(pp.x, pp.y - 1)) || (tothisdir === 'd' && isOkToGo(pp.x, pp.y + 1)) || (tothisdir === 'l' && isOkToGo(pp.x - 1, pp.y)) || (tothisdir === 'r' && isOkToGo(pp.x + 1, pp.y)))) && utils.randomInt(10) > 3) {
+      ttd = tothisdir;
+      game.player.walk(map, tothisdir);
+    } else if (pp.x < dstcs.x && isOkToGo(pp.x + 1, pp.y) && utils.randomInt(10) > 4) {
+      game.player.walk(map, 'r');
+    } else if (pp.y < dstcs.y && isOkToGo(pp.x, pp.y + 1) && utils.randomInt(10) > 4) {
+      game.player.walk(map, 'd');
+    } else if (pp.x > dstcs.x && isOkToGo(pp.x - 1, pp.y) && utils.randomInt(10) > 4) {
+      game.player.walk(map, 'l');
+    } else if (pp.y > dstcs.y && isOkToGo(pp.x, pp.y - 1) && utils.randomInt(10) > 4) {
+      game.player.walk(map, 'u');
+    } else {
+      ttd = null;
+      f = function() {
+        var d;
+        d = [
+          {
+            d: 'r',
+            x: pp.x + 1,
+            y: pp.y
+          }, {
+            d: 'l',
+            x: pp.x - 1,
+            y: pp.y
+          }, {
+            d: 'd',
+            x: pp.x,
+            y: pp.y + 1
+          }, {
+            d: 'u',
+            x: pp.x,
+            y: pp.y - 1
+          }
+        ][utils.randomInt(4)];
+        if (isOkToGo(d.x, d.y)) {
+          game.player.walk(map, d.d);
+          return ttd = d.d;
+        } else {
+          return f();
+        }
+      };
+      f();
+    }
+    game.fire('turn');
+    return setTimeout((function() {
+      return commands['x'](game, ttd);
+    }), 80);
   }
 };
