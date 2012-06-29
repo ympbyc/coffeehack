@@ -46,4 +46,55 @@ commands = {
       item = game.player.inventory.removeItem(ch)
       console.log(item)
       game.addItem(pp.x, pp.y, item)
+      null
+
+  'x' : (game, tothisdir=null) ->
+    if game.player.isDead() then game.player.hp = 100
+    console.log tothisdir
+    map = game.currentMap()
+    dstcs = (->
+      for i in [0...map._map.length]
+        for j in [0...map._map[i].length]
+          return {x:j, y:i} if map.getCell(j, i) is Map.STAIR_DOWN
+    )()
+
+    isOkToGo = (x, y) ->
+      if map.isWalkable(x, y) or map.isAttackable(x, y) then true
+      else false
+
+    pp = game.player.getPosition()
+    rnd = !(utils.randomInt(10) < 3)
+    nbc = map.getNearbyCells()
+    if map.getCell(pp.x, pp.y) is Map.STAIR_DOWN then commands['>'](game)
+    else if (tothisdir and (
+          (tothisdir is 'u' and isOkToGo(pp.x, pp.y-1)) or
+          (tothisdir is 'd' and isOkToGo(pp.x, pp.y+1)) or
+          (tothisdir is 'l' and isOkToGo(pp.x-1, pp.y)) or
+          (tothisdir is 'r' and isOkToGo(pp.x+1, pp.y))
+       )) and utils.randomInt(10) > 3
+         ttd = tothisdir
+         game.player.walk(map, tothisdir)
+    else if pp.x < dstcs.x && isOkToGo(pp.x+1, pp.y) and utils.randomInt(10) > 4
+      game.player.walk(map, 'r')
+    else if pp.y < dstcs.y &&  isOkToGo(pp.x, pp.y+1) and utils.randomInt(10) > 4
+      game.player.walk(map, 'd')
+    else if pp.x > dstcs.x && isOkToGo(pp.x-1, pp.y) and utils.randomInt(10) > 4
+      game.player.walk(map, 'l')
+    else if pp.y > dstcs.y &&  isOkToGo(pp.x, pp.y-1)  and utils.randomInt(10) > 4
+      game.player.walk(map, 'u')
+    else
+        ttd = null
+        f = ->
+          d= [{d:'r', x:pp.x+1, y:pp.y},
+           {d:'l', x:pp.x-1, y:pp.y},
+           {d:'d', x:pp.x, y:pp.y+1},
+           {d:'u', x:pp.x, y:pp.y-1}
+          ][utils.randomInt(4)]
+          if isOkToGo(d.x, d.y)
+            game.player.walk(map, d.d)
+            ttd = d.d
+          else f()
+        f()
+    game.fire('turn')
+    setTimeout((->commands['x'](game, ttd)), 80)
 }

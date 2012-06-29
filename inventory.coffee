@@ -1,5 +1,5 @@
 class Inventory extends EventEmitter
-  @validchars = ['a','b','c']#,'d','e','f','g','h','i','j','k'] # ...
+  @validchars = ['a','b','c','d','e','f','g','h','i','j','k'] # ...
 
   constructor : ->
     super()

@@ -29,9 +29,9 @@ main  = ->
   currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
   message = [
     '',
-    ' The following is written in a secret scroll you inherited from your ancestor.',
-    '  "There once were mean dragons crawling all around us on the ground',
-    '    In 1997 we have succeeded to lock them in the ancient underground dungeon at the centre of our town."',
+    ' ',
+    ' ',
+    ' ',
     'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
   ## Use jQuery for cross-browser keyboard event handling.
@@ -97,7 +97,8 @@ main  = ->
     if not game.nextMap() #false when there is no map deeper than the current
       game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
       game.nextMap()
-    game.player.born(game.currentMap())
+    map = game.currentMap()
+    game.player.born(map, map.stair_pos_up)
     game.fire('mapchange')
   )
   game.on('godown', ->
@@ -106,7 +107,8 @@ main  = ->
   )
   game.on('goup', ->
     game.prevMap()
-    game.player.born(game.currentMap())
+    map = game.currentMap()
+    game.player.born(map, map.stair_pos_down)
     game.fire('mapchange')
   )
   game.on('goup', ->
@@ -221,4 +223,4 @@ unless Function::bind
     fBound
 
 
-#window.addEventListener('load', main)
+window.addEventListener('load', main)

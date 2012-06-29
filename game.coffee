@@ -120,7 +120,7 @@
     #
     turnEnd : ->
       @killMonsters()
-      alert 'you died' if @player.isDead()
+      #alert 'you died' if @player.isDead()
 
     ## Call the show method of the current map
     ## with monsters and the player set to it.
