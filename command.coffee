@@ -48,53 +48,40 @@ commands = {
       game.addItem(pp.x, pp.y, item)
       null
 
-  'x' : (game, tothisdir=null) ->
-    if game.player.isDead() then game.player.hp = 100
-    console.log tothisdir
+  'x' : (game, dir = {d:'u', x:0, y:-1, hd:'r', hx:1, hy:0}) ->
+    alert ('You died.') if game.player.isDead()
     map = game.currentMap()
-    dstcs = (->
-      for i in [0...map._map.length]
-        for j in [0...map._map[i].length]
-          return {x:j, y:i} if map.getCell(j, i) is Map.STAIR_DOWN
-    )()
-
+    pp = game.player.getPosition()
+    nextd = {
+      u: {d:'l', x:-1, y:0,  hd:'u', hx:0,  hy:-1}
+      l: {d:'d', x:0,  y:1,  hd:'l', hx:-1, hy:0}
+      d: {d:'r', x:1,  y:0,  hd:'d', hx:0,  hy:1}
+      r: {d:'u', x:0,  y:-1, hd:'r', hx:1,  hy:0}
+    }
+    prevd = {
+      u: {d:'r', x:1,  y:0,  hd:'d', hx:0,  hy:1}
+      l: {d:'u', x:0,  y:-1, hd:'r', hx:1,  hy:0}
+      d: {d:'l', x:-1, y:0,  hd:'u', hx:0,  hy:-1}
+      r: {d:'d', x:0,  y:1,  hd:'l', hx:-1, hy:0}
+    }
     isOkToGo = (x, y) ->
       if map.isWalkable(x, y) or map.isAttackable(x, y) then true
       else false
 
-    pp = game.player.getPosition()
-    rnd = !(utils.randomInt(10) < 3)
-    nbc = map.getNearbyCells()
     if map.getCell(pp.x, pp.y) is Map.STAIR_DOWN then commands['>'](game)
-    else if (tothisdir and (
-          (tothisdir is 'u' and isOkToGo(pp.x, pp.y-1)) or
-          (tothisdir is 'd' and isOkToGo(pp.x, pp.y+1)) or
-          (tothisdir is 'l' and isOkToGo(pp.x-1, pp.y)) or
-          (tothisdir is 'r' and isOkToGo(pp.x+1, pp.y))
-       )) and utils.randomInt(10) > 3
-         ttd = tothisdir
-         game.player.walk(map, tothisdir)
-    else if pp.x < dstcs.x && isOkToGo(pp.x+1, pp.y) and utils.randomInt(10) > 4
-      game.player.walk(map, 'r')
-    else if pp.y < dstcs.y &&  isOkToGo(pp.x, pp.y+1) and utils.randomInt(10) > 4
-      game.player.walk(map, 'd')
-    else if pp.x > dstcs.x && isOkToGo(pp.x-1, pp.y) and utils.randomInt(10) > 4
-      game.player.walk(map, 'l')
-    else if pp.y > dstcs.y &&  isOkToGo(pp.x, pp.y-1)  and utils.randomInt(10) > 4
-      game.player.walk(map, 'u')
+    else if isOkToGo(pp.x+dir.x, pp.y+dir.y)
+      if not isOkToGo(pp.x+dir.hx, pp.y+dir.hy)
+        game.player.walk(map, dir.d)
+      else
+        game.player.walk(map, dir.hd)
+        #dir = prevd[dir.d]
+      game.fire('turn')
+    else if isOkToGo(pp.x+dir.hx, pp.y+dir.hy)
+      game.player.walk(map, dir.hd)
+      dir = prevd[dir.d]
+      game.fire('turn')
     else
-        ttd = null
-        f = ->
-          d= [{d:'r', x:pp.x+1, y:pp.y},
-           {d:'l', x:pp.x-1, y:pp.y},
-           {d:'d', x:pp.x, y:pp.y+1},
-           {d:'u', x:pp.x, y:pp.y-1}
-          ][utils.randomInt(4)]
-          if isOkToGo(d.x, d.y)
-            game.player.walk(map, d.d)
-            ttd = d.d
-          else f()
-        f()
-    game.fire('turn')
-    setTimeout((->commands['x'](game, ttd)), 80)
+      dir = nextd[dir.d]
+
+    setTimeout((->commands['x'](game, dir)),100)
 }

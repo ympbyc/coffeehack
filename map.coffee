@@ -74,17 +74,19 @@
     ## create special cells such as staircases, traps and ninjitsu fields
     #
     _createSpecialCells : ->
-      f = (type, occurance = 1, memo) =>
+      f = (type, occurance = 1, memo, bywall) =>
         if occurance
           x = utils.randomInt(@width-1); y = utils.randomInt(@height-1)
           if @_map[y][x] and @_map[y][x] is Map.FLOOR
-            @_map[y][x] =  type
-            f(type, occurance -= 1, {x:x,y:y})
-          else f(type, occurance)
+            if (bywall and @getNearbyCells(x,y).indexOf(Map.WALL) > -1) or not bywall
+              @_map[y][x] =  type
+              f(type, occurance -= 1, {x:x,y:y})
+            f(type, occurance, null, bywall)
+          else f(type, occurance, null, bywall)
         else
           memo
-      @stair_pos_up = f(Map.STAIR_UP)
-      @stair_pos_down = f(Map.STAIR_DOWN)
+      @stair_pos_up = f(Map.STAIR_UP, 1, null, true)
+      @stair_pos_down = f(Map.STAIR_DOWN, 1, null, true)
       f(Map.TRAP, utils.randomInt(5))
       f(Map.NINJITSU, 3)
       @_map
