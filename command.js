@@ -95,29 +95,91 @@ commands = {
       return null;
     };
   },
-  'x': function(game, tothisdir) {
-    var dstcs, f, isOkToGo, map, nbc, pp, rnd, ttd;
-    if (tothisdir == null) {
-      tothisdir = null;
+  'x': function(game, dir) {
+    var isOkToGo, map, nextd, pp, prevd;
+    if (dir == null) {
+      dir = {
+        d: 'u',
+        x: 0,
+        y: -1,
+        hd: 'r',
+        hx: 1,
+        hy: 0
+      };
     }
     if (game.player.isDead()) {
-      game.player.hp = 100;
+      alert('You died.');
     }
-    console.log(tothisdir);
     map = game.currentMap();
-    dstcs = (function() {
-      var i, j, _i, _j, _ref, _ref1;
-      for (i = _i = 0, _ref = map._map.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-        for (j = _j = 0, _ref1 = map._map[i].length; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
-          if (map.getCell(j, i) === Map.STAIR_DOWN) {
-            return {
-              x: j,
-              y: i
-            };
-          }
-        }
+    pp = game.player.getPosition();
+    nextd = {
+      u: {
+        d: 'l',
+        x: -1,
+        y: 0,
+        hd: 'u',
+        hx: 0,
+        hy: -1
+      },
+      l: {
+        d: 'd',
+        x: 0,
+        y: 1,
+        hd: 'l',
+        hx: -1,
+        hy: 0
+      },
+      d: {
+        d: 'r',
+        x: 1,
+        y: 0,
+        hd: 'd',
+        hx: 0,
+        hy: 1
+      },
+      r: {
+        d: 'u',
+        x: 0,
+        y: -1,
+        hd: 'r',
+        hx: 1,
+        hy: 0
       }
-    })();
+    };
+    prevd = {
+      u: {
+        d: 'r',
+        x: 1,
+        y: 0,
+        hd: 'd',
+        hx: 0,
+        hy: 1
+      },
+      l: {
+        d: 'u',
+        x: 0,
+        y: -1,
+        hd: 'r',
+        hx: 1,
+        hy: 0
+      },
+      d: {
+        d: 'l',
+        x: -1,
+        y: 0,
+        hd: 'u',
+        hx: 0,
+        hy: -1
+      },
+      r: {
+        d: 'd',
+        x: 0,
+        y: 1,
+        hd: 'l',
+        hx: -1,
+        hy: 0
+      }
+    };
     isOkToGo = function(x, y) {
       if (map.isWalkable(x, y) || map.isAttackable(x, y)) {
         return true;
@@ -125,57 +187,24 @@ commands = {
         return false;
       }
     };
-    pp = game.player.getPosition();
-    rnd = !(utils.randomInt(10) < 3);
-    nbc = map.getNearbyCells();
     if (map.getCell(pp.x, pp.y) === Map.STAIR_DOWN) {
       commands['>'](game);
-    } else if ((tothisdir && ((tothisdir === 'u' && isOkToGo(pp.x, pp.y - 1)) || (tothisdir === 'd' && isOkToGo(pp.x, pp.y + 1)) || (tothisdir === 'l' && isOkToGo(pp.x - 1, pp.y)) || (tothisdir === 'r' && isOkToGo(pp.x + 1, pp.y)))) && utils.randomInt(10) > 3) {
-      ttd = tothisdir;
-      game.player.walk(map, tothisdir);
-    } else if (pp.x < dstcs.x && isOkToGo(pp.x + 1, pp.y) && utils.randomInt(10) > 4) {
-      game.player.walk(map, 'r');
-    } else if (pp.y < dstcs.y && isOkToGo(pp.x, pp.y + 1) && utils.randomInt(10) > 4) {
-      game.player.walk(map, 'd');
-    } else if (pp.x > dstcs.x && isOkToGo(pp.x - 1, pp.y) && utils.randomInt(10) > 4) {
-      game.player.walk(map, 'l');
-    } else if (pp.y > dstcs.y && isOkToGo(pp.x, pp.y - 1) && utils.randomInt(10) > 4) {
-      game.player.walk(map, 'u');
+    } else if (isOkToGo(pp.x + dir.x, pp.y + dir.y)) {
+      if (!isOkToGo(pp.x + dir.hx, pp.y + dir.hy)) {
+        game.player.walk(map, dir.d);
+      } else {
+        game.player.walk(map, dir.hd);
+      }
+      game.fire('turn');
+    } else if (isOkToGo(pp.x + dir.hx, pp.y + dir.hy)) {
+      game.player.walk(map, dir.hd);
+      dir = prevd[dir.d];
+      game.fire('turn');
     } else {
-      ttd = null;
-      f = function() {
-        var d;
-        d = [
-          {
-            d: 'r',
-            x: pp.x + 1,
-            y: pp.y
-          }, {
-            d: 'l',
-            x: pp.x - 1,
-            y: pp.y
-          }, {
-            d: 'd',
-            x: pp.x,
-            y: pp.y + 1
-          }, {
-            d: 'u',
-            x: pp.x,
-            y: pp.y - 1
-          }
-        ][utils.randomInt(4)];
-        if (isOkToGo(d.x, d.y)) {
-          game.player.walk(map, d.d);
-          return ttd = d.d;
-        } else {
-          return f();
-        }
-      };
-      f();
+      dir = nextd[dir.d];
     }
-    game.fire('turn');
     return setTimeout((function() {
-      return commands['x'](game, ttd);
-    }), 80);
+      return commands['x'](game, dir);
+    }), 100);
   }
 };

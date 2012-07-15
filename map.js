@@ -173,7 +173,7 @@ Map = (function() {
   Map.prototype._createSpecialCells = function() {
     var f,
       _this = this;
-    f = function(type, occurance, memo) {
+    f = function(type, occurance, memo, bywall) {
       var x, y;
       if (occurance == null) {
         occurance = 1;
@@ -182,20 +182,23 @@ Map = (function() {
         x = utils.randomInt(_this.width - 1);
         y = utils.randomInt(_this.height - 1);
         if (_this._map[y][x] && _this._map[y][x] === Map.FLOOR) {
-          _this._map[y][x] = type;
-          return f(type, occurance -= 1, {
-            x: x,
-            y: y
-          });
+          if ((bywall && _this.getNearbyCells(x, y).indexOf(Map.WALL) > -1) || !bywall) {
+            _this._map[y][x] = type;
+            f(type, occurance -= 1, {
+              x: x,
+              y: y
+            });
+          }
+          return f(type, occurance, null, bywall);
         } else {
-          return f(type, occurance);
+          return f(type, occurance, null, bywall);
         }
       } else {
         return memo;
       }
     };
-    this.stair_pos_up = f(Map.STAIR_UP);
-    this.stair_pos_down = f(Map.STAIR_DOWN);
+    this.stair_pos_up = f(Map.STAIR_UP, 1, null, true);
+    this.stair_pos_down = f(Map.STAIR_DOWN, 1, null, true);
     f(Map.TRAP, utils.randomInt(5));
     f(Map.NINJITSU, 3);
     return this._map;
