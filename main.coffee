@@ -115,7 +115,7 @@ main  = ->
   game.on('turnend', ->
     if message[MESSAGE_SIZE].length
       message.shift()
-      $('message').html(message.join('\n'))
+      $('#message').html(message.join('\n'))
       message.push('')
   )
 
