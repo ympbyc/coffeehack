@@ -1,0 +1,19 @@
+{
+  "name": "coffeehack",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ympbyc/coffeehack.git"
+  },
+  "dependencies": {
+    "express": "*",
+    "connect-assets": "*",
+    "coffee-script": "*",
+    "ejs": "*"
+  },
+  "description": "coffeehack - roguelike game in your browser!"
+}
