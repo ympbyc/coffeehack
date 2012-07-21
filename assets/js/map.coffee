@@ -75,14 +75,14 @@ class hack.Map
   ## create special cells such as staircases, traps and ninjitsu fields
   #
   _createSpecialCells : ->
-    f = (type, occurance = 1, memo, bywall) =>
+    f = (type, occurance = 1, memo=null, bywall=false) =>
       if occurance
         x = utils.randomInt(@width-1); y = utils.randomInt(@height-1)
         if @_map[y][x] and @_map[y][x] is Map.FLOOR
           if (bywall and @getNearbyCells(x,y).indexOf(Map.WALL) > -1) or not bywall
             @_map[y][x] =  type
             f(type, occurance -= 1, {x:x,y:y})
-          f(type, occurance, null, bywall)
+          else f(type, occurance, null, bywall)
         else f(type, occurance, null, bywall)
       else
         memo
