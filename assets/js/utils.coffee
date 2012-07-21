@@ -1,4 +1,4 @@
-utils = {}
+hack.utils = utils = {}
 utils.randomInt = (max) ->
   Math.floor(Math.random()*max)
 

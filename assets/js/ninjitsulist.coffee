@@ -1,6 +1,6 @@
 #dependencie - instance of the Game class
 
-ninjitsulist = [
+hack.ninjitsulist =  ninjitsulist = [
   {
     name : 'jistu of healing',
     jitsu : ((game) ->

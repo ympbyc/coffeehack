@@ -1,4 +1,4 @@
-commands = {
+hack.commands = {
   '>' : (game) ->
     pp = game.player.getPosition()
     if game.currentMap().getCell(pp.x, pp.y) is Map.STAIR_DOWN

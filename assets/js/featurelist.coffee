@@ -1,4 +1,4 @@
-features = (->
+hack.features = features = (->
   featurelist = [
     #small room
     "#####;
@@ -106,10 +106,10 @@ features = (->
   ]
 
   matchTable = {
-    '#' : Map.WALL
-    ' ' : Map.EARTH
-    '.' : Map.FLOOR
-    '~' : Map.WATER
+    '#' : hack.Map.WALL
+    ' ' : hack.Map.EARTH
+    '.' : hack.Map.FLOOR
+    '~' : hack.Map.WATER
   }
 
   mapify = (fstr) ->
@@ -119,3 +119,4 @@ features = (->
 
   (mapify(feature) for feature in  featurelist)
 )()
+

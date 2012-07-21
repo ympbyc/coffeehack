@@ -14,18 +14,26 @@
 #                (tile.coffee), traplist.coffee, itemlist.coffee, item.coffee
 ###
 
+{
+  messagelist, monsterlist, commands, items, ninjitsulist, traplist
+  Player, Monster
+  Item, Weapon
+  Map
+  utils
+} = hack
+
 MAP_WIDTH = 40
 MAP_HEIGHT = 30
 MAX_MONSTER = 10 #maximum number of monsters that can exist on the map
 MESSAGE_SIZE = 4 #number of massages to save
 
 main  = ->
-  game = new Game()
-  game.setPlayer(new Player('coffeedrinker', 'Ninja', 12))
-  game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
+  game = new hack.Game()
+  game.setPlayer(new hack.Player('coffeedrinker', 'Ninja', 12))
+  game.addMap(new hack.Map(MAP_WIDTH, MAP_HEIGHT))
   game.nextMap()
   game.player.born(game.currentMap())
-  tile = new Tile('ch-canvas') #set up the canvas element
+  tile = new hack.Tile('ch-canvas') #set up the canvas element
   currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
   message = [
     '',

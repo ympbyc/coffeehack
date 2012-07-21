@@ -6,7 +6,8 @@
 # dependencie - player.coffee, utils.coffee
 ###
 
-class Monster extends Player
+{utils} = hack
+class hack.Monster extends hack.Player
   constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
     hp = utils.dice(@explevel, 8) # NETHACK LOGIC
     super(null, @role, hp, @explevel, @gainExp, @dice)
