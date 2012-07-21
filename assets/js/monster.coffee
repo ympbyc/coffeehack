@@ -1,10 +1,10 @@
-  ###
-  # monster.coffeee
-  # Monsters are players, with an extended method move.
-  # They are designed to chase "the player" and attack them
-  #
-  # dependencie - player.coffee, utils.coffee
-  ###
+###
+# monster.coffeee
+# Monsters are players, with an extended method move.
+# They are designed to chase "the player" and attack them
+#
+# dependencie - player.coffee, utils.coffee
+###
 
 {utils} = hack
 class hack.Monster extends hack.Player

@@ -1,3 +1,4 @@
+{Map} = hack
 hack.commands = {
   '>' : (game) ->
     pp = game.player.getPosition()
@@ -83,5 +84,5 @@ hack.commands = {
     else
       dir = nextd[dir.d]
 
-    setTimeout((->commands['x'](game, dir)),100)
+    setTimeout((->hack.commands['x'](game, dir)),100)
 }
