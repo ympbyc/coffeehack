@@ -1,12 +1,14 @@
   ###
   # monster.coffeee
-  # Monsters are players, with an extended method walk.
+  # Monsters are players, with an extended method move.
   # They are designed to chase "the player" and attack them
   #
   # dependencie - player.coffee, utils.coffee
   ###
 
-  class Monster extends Player
+  utils = CH. utils
+
+  class Monster extends CH.Player
     constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
       hp = utils.dice(@explevel, 8) # NETHACK LOGIC
       super(null, @role, hp, @explevel, @gainExp, @dice)
@@ -31,3 +33,5 @@
             else false)
           if direction then @walk(map, direction)
           else fallback()
+
+  CH.Monster = Monster

@@ -1,8 +1,8 @@
 # dependencie - messagelist.coffee, instance of the Game class
 
-message = messagelist
+message = CH.messagelist
 
-traplist = [
+CH.traplist = [
     #hole
   (game) ->
     game.fire('message', {message : message.trap.hole})

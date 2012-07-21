@@ -19,3 +19,5 @@ messagelist.player = {
 messagelist.monster = {
   attack : "the ? ? ?.",
 }
+
+CH.messagelist = messagelist

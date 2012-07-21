@@ -42,3 +42,5 @@ ninjitsulist = [
     message : 'Some magical power pulled your pants up.'
   }
 ]
+
+CH.ninjitsulist = ninjitsulist

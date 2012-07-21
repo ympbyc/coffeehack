@@ -83,3 +83,5 @@ class Tile
 
   resetWithMap : ->
     @surface.drawImage(@currentMapImage, 0, 0)
+
+CH.Tile = Tile

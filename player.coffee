@@ -4,10 +4,13 @@
   # Monsters extend this class therefore if the word 'player' appears
   # in this file, it also represents monsters
   #
-  # dependencie - utils.coffee
+  # dependencie - utils.coffee, eventemitter.coffee, inventory.coffee
   ###
 
-  class Player extends EventEmitter
+  utils = CH.utils
+  Inventory = CH.Inventory
+
+  class Player extends CH.EventEmitter
 
     ## explevel vs experience
     #
@@ -26,7 +29,7 @@
       super()
       @_position = {}
       @experience = 0
-      @inventory = new Inventory()
+      @inventory = new  Inventory()
       @on('godown', (e) =>
         e.prevMap.clearReservation(@getPosition().x, @getPosition().y) if e.prevMap #evaluates to false on initialization
       )
@@ -129,3 +132,5 @@
       console.log weapon
       @dice = weapon.dice if weapon?
       weapon
+
+  CH.Player = Player

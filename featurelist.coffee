@@ -1,4 +1,6 @@
-features = (->
+Map = CH.Map
+
+CH.features = (->
   featurelist = [
     #small room
     "#####;

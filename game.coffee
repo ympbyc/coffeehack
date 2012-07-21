@@ -1,6 +1,6 @@
 # dependencie - eventemitter.coffee
 
-  class Game extends EventEmitter
+  class Game extends CH.EventEmitter
     constructor : ->
       super()
       @monsterStack = [[]] #y-axis holds floor levels
@@ -144,3 +144,5 @@
           objectLayer[monsterPos.y][monsterPos.x] = m
 
       objectLayer
+
+  CH.Game = Game

@@ -20,30 +20,47 @@ MAX_MONSTER = 10 #maximum number of monsters that can exist on the map
 MESSAGE_SIZE = 4 #number of massages to save
 
 main  = ->
-  game = new Game()
-  game.setPlayer(new Player('coffeedrinker', 'Ninja', 12))
-  game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
+  utils = CH.utils
+  commands = CH.commands
+  monsterlist = CH.monsterlist
+  traplist = CH.traplist
+  items = CH.items
+  ninjitsulist = CH.ninjitsulist
+  messagelist = CH.messagelist
+  Map = CH.Map
+
+  game = new CH.Game()
+  game.setPlayer(new CH.Player('coffeedrinker', 'Ninja', 12))
+  game.addMap(new CH.Map(MAP_WIDTH, MAP_HEIGHT))
   game.nextMap()
   game.player.born(game.currentMap())
-  tile = new Tile('ch-canvas') #set up the canvas element
-  currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
+  tile = new CH.Tile('ch-canvas') #set up the canvas element
+  currentmonsterlist = (m for m in CH.monsterlist when m[1] <= 1)
   message = [
     '',
-    ' ',
-    ' ',
-    ' ',
+    '',
+    '',
+    '',
     'Welcome to coffeehack. You are a neutral male ninja. Slay the dragons!']
 
   ## Use jQuery for cross-browser keyboard event handling.
-  ## This should be replaced with a lighter function specialized for this occasion.
-  $(document).on('keypress', (e) ->
-#    console.log(e.which)
+
+  $document = $(document)
+
+  ###
+  # This is the main game loop of coffeehack.
+  # This gets called every time the user hits a key.
+  # Execution of the user's action take place before anything else happens.
+  # After that, the turn emits.
+  ###
+  $document.bind('keypress', mainlistener = (e) ->
     keyChar = getKeyChar(e.which) #middleware wraps the keycode difference in each browser
 
+    #map directional key to direction string for player.walk
     direction = {
       'k':'u', 'j':'d', 'l':'r',  'h':'l',
       'y':'ul', 'u':'ur', 'b':'ll', 'n':'lr'
-    } #kjlh
+    }
     if direction[keyChar]
       game.player.walk(game.currentMap(),  direction[keyChar])
 
@@ -54,18 +71,22 @@ main  = ->
     game.fire('turn')
   )
 
+  ###
+  # Manipulation of monsters occur after the player has done his action.
+  ###
   game.on('turn', ->
-    ## 0.5 may well be too much, nedd more conideration
+    # add a monster
     if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
-      monster = new Monster(currentmonsterlist[utils.randomInt(currentmonsterlist.length)]...) # NETHACK LOGIC
+      monster = new CH.Monster(currentmonsterlist[utils.randomInt(currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
         game.fire('message', {message : messagelist.format(messagelist.monster.attack, e.me.role, action, tgt)})
       )
+      # monsters occasionaly drop weapons
       monster.on('die', (e) ->
         pos = e.beef.getPosition()
-        weapon = new Weapon(items.weapons[utils.randomInt(items.weapons.length)]...)
+        weapon = new CH.Weapon(items.weapons[utils.randomInt(items.weapons.length)]...)
         if weapon.rareness > utils.randomInt(100)
           game.addItem(pos.x, pos.y, weapon)
         else
@@ -73,38 +94,56 @@ main  = ->
       )
       game.addMonster(monster)
 
-    game.moveAllMonsters()
+    game.moveAllMonsters() #call move method on each monster
     game.fire('turnend')
   )
 
+  ###
+  # Update the screen when the turn ends.
+  ###
   game.on('turnend', ->
     #document.getElementById('jshack').innerHTML = game.drawStage() #activate when you want the text-mode
-    updateObjects(game.drawObjects())
-    status = [game.player.name, '@ floor -', game.level, '\n',
-      'hp:', Math.floor(game.player.hp), '/', game.player.getMaxHP(), 'exp:', Math.floor(game.player.experience*10)*1/10, 'time:', game.time, 'score:', game.score
-    ].join(' ')
-    game.fire('status', {status : status}) #writes out the status line at the botttom
+    updateObjects(game.drawObjects()) # update the object layer to reflect current state
+    status = "#{game.player.name} @ floor - #{game.level} \n
+ hp: #{Math.floor(game.player.hp)} / #{game.player.getMaxHP()} exp: #{Math.floor(game.player.experience*10)*1/10} time: #{game.time} score: #{game.score}"
+    game.fire('status', {status : status}) #writes out the status line at the botttom of the screen
   )
 
+  ###
+  # Update the message area if anything interesting happened on this turn
+  ###
   game.on('turnend', ->
     if message[MESSAGE_SIZE].length
       message.shift()
-      document.getElementById('message').innerHTML = message.join('\n')
+      $('message').html(message.join('\n'))
       message.push('')
   )
 
+  ###
+  # This event fires when the player hit '>' key on downward staircases.
+  # This listener gives birth to the player on the next level.
+  # A new floor has to be generated if the player hasn't been to that level.
+  ###
   game.on('godown', ->
     if not game.nextMap() #false when there is no map deeper than the current
-      game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
+      game.addMap(new CH.Map(MAP_WIDTH, MAP_HEIGHT))
       game.nextMap()
     map = game.currentMap()
     game.player.born(map, map.stair_pos_up)
     game.fire('mapchange')
   )
+
+  ###
+  # The variation of monsters that appear in a level increases as the player goes deeper.
+  ###
   game.on('godown', ->
     currentmonsterlist = (m for m in monsterlist when m[1] <= (((game.player.explevel or 1) + game.level)/2)) #NETHACK LOGIC
     console.log(currentmonsterlist)
   )
+
+  ###
+  # reversed 'godown'
+  ###
   game.on('goup', ->
     game.prevMap()
     map = game.currentMap()
@@ -114,26 +153,47 @@ main  = ->
   game.on('goup', ->
     currentmonsterlist = (m for m in monsterlist when m[1] <= ((game.player.explevel + game.level)/2 or 1)) #NETHACK LOGIC
   )
+
+  ###
+  # Messages that are generated as a result of specific events
+  # are acumurated here till the end of the turn
+  ###
   game.on('message', (e) ->
     message[MESSAGE_SIZE] += ' ' + e.message
   )
 
+
   game.on('status', (e) ->
-    document.getElementById('status').innerHTML = e.status
+    $('#status').html(e.status)
   )
 
+  ###
+  # commands such as 'w'(wield) take an argument.
+  # These commands are difined as higher order functions
+  # and returns an anonymous function that take a charactor as its argument.
+  # This listener is responsible for feeding the user input to this anonymous function
+  ###
   game.on('argumentrequest', (e) ->
+    $document.unbind('keypress', mainlistener)
     listener = (ev) ->
-      document.removeEventListener('keypress', listener)
+      $document.unbind('keypress', listener)
+      $document.bind('keypress', mainlistener)
       e.command(getKeyChar(ev.keyCode))
-    document.addEventListener('keypress', listener)
+    $document.bind('keypress', listener)
   )
 
+  ###
+  # Fires a message on an attack
+  ###
   game.player.on('attack', (e) ->
     mode = if e.enemy.isDead() then 'killed' else 'hit'
     game.fire('message', {message : messagelist.format(messagelist.player.attack, mode, e.enemy.role)})
   )
 
+  ###
+  # Traps are functions that take the instence of the game.
+  # Which type of trap to be activated is decided on the fly each time the player come across it
+  ###
   game.player.on('move', (e) ->
     if [Map.TRAP, Map.TRAP_ACTIVE].indexOf(game.currentMap().getCell(e.position.x, e.position.y)) > -1
       pp = game.player.getPosition()
@@ -142,12 +202,17 @@ main  = ->
       traplist[utils.randomInt(traplist.length)](game) #trap type is decided randomly on the fly
   )
 
+  ###
+  # Same applies to ninjitsu fields
+  ###
   game.player.on('move', (ev) ->
     if game.currentMap().getCell(ev.position.x, ev.position.y) is Map.NINJITSU
       ninjitsu = ninjitsulist[utils.randomInt(ninjitsulist.length)] #ninjutsus, too decided randomly
       game.fire('message', {message :"#{ ninjitsu.name} : #{ninjitsu.description}. spell? (y or anything else)"})
+
       listener = (e) ->
-        document.removeEventListener('keypress', listener)
+        $document.unbind('keypress', listener)
+        $document.bind('keypress', mainlistener) #enable main eventlistener
         if getKeyChar(e.keyCode) is 'y'
           ninjitsu.jitsu(game)
           game.fire('message', {message : ninjitsu.message})
@@ -155,23 +220,38 @@ main  = ->
           game.fire('mapchange')
           game.fire('turn')
 
-      document.addEventListener('keypress', listener)
+      $document.unbind('keypress', mainlistener) #disable main eventlistener
+      $document.bind('keypress', listener)
   )
+
+  ###
+  # Fire a message on experience-level-ups
+  ###
   game.player.on('explevelup', (e) ->
     game.score += 100
     game.fire('message', {message : "Welcome to experience level #{e.explevel}."})
   )
+  ###
+  # Give a score on each kill
+  ###
   game.player.on('killedanenemy', ->
     game.score += 100
   )
 
+  # constant
   prevmapstr = (for i in [0...MAP_WIDTH*MAP_HEIGHT]
     '0').join('')
 
+  ###
+  # Update the map only when some changes happen
+  ###
   game.on('mapchange', ->
     updateCanvasMap(game.currentMap().show())
   )
 
+  ###
+  # Translate the map represented in rogue characters to graphical tiles
+  ###
   updateCanvasMap = (mapstr) ->
     mapstr = mapstr.replace(/\n/g, '')
     ptr = -1
@@ -197,30 +277,18 @@ main  = ->
       tile.resetWithMap()
       for i,row of objectLayer
         for j, cell of row
-          if cell instanceof Player
+          if cell instanceof CH.Player
             tile.update(j, i, 'monster', cell.role)
-          else if cell instanceof Weapon
+          else if cell instanceof CH.Weapon
             tile.update(j, i, 'weapon', cell.name)
 
   updateCanvasMap(game.currentMap().show())
   game.fire('turn')
 
+###
+# Get character from keycode
+###
 getKeyChar = (keyCode) ->
   String.fromCharCode(keyCode)
 
-unless Function::bind
-  Function::bind = (oThis) ->
-    throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable")  if typeof this isnt "function"
-    aArgs = Array::slice.call(arguments, 1)
-    fToBind = this
-    fNOP = ->
-
-    fBound = ->
-      fToBind.apply (if this instanceof fNOP then this else oThis or window), aArgs.concat(Array::slice.call(arguments))
-
-    fNOP:: = @::
-    fBound:: = new fNOP()
-    fBound
-
-
-window.addEventListener('load', main)
+$(window).bind('load', main)

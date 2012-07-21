@@ -1,3 +1,4 @@
+Map = CH.Map
 commands = {
   '>' : (game) ->
     pp = game.player.getPosition()
@@ -85,3 +86,5 @@ commands = {
 
     setTimeout((->commands['x'](game, dir)),100)
 }
+
+CH.commands = commands

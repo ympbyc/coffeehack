@@ -1,4 +1,6 @@
-  #dep utils
+  #dep utils, featurelist
+
+  utils = CH.utils
 
   class Map
     @EARTH = 0
@@ -92,6 +94,8 @@
       @_map
 
     constructor : (@width, @height) ->
+      features = CH.features
+
       @_map = _createEarth(@width, @height)
       @_singleRoomAtTheCentre()
 
@@ -193,3 +197,5 @@
         @getReservation(x+1, y-1),
         @getReservation(x-1, y-1)
       ]
+
+  CH.Map = Map
