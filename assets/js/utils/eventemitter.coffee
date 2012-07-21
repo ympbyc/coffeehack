@@ -8,9 +8,9 @@ class hack.EventEmitter
       listener: listener
 
   off : (type, listener) ->
-    for stack, i in @listenerStack when (stack?.type is type) and (stack?.listener is listener)
-      @listenerStack[i] = undefined
+    @listenerStack = _.reject @listenerStack, (stack) => 
+      (stack.type is type) and (stack.listener is listener)
 
   fire : (type, obj) ->
-    for item in @listenerStack when item?.type is type
+    for item in @listenerStack when item.type is type
       item.listener(obj)
