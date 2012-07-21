@@ -1,7 +1,6 @@
-#dep utils
-utils = hack.utils
+{utils} = hack
 
-class hack.Map
+class Map
   @EARTH = 0
   @WATER = 1
   @FLOOR = 2
@@ -194,3 +193,4 @@ class hack.Map
       @getReservation(x+1, y-1),
       @getReservation(x-1, y-1)
     ]
+hack.Map = Map
