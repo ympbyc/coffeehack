@@ -4,12 +4,10 @@
 # monster.coffeee
 # Monsters are players, with an extended method move.
 # They are designed to chase "the player" and attack them
-#
-# dependencie - player.coffee, utils.coffee
 ###
 
-{utils} = hack
-class hack.Monster extends hack.Player
+{utils, Player} = hack
+class hack.Monster extends Player
   constructor : (@role, @difficulty, @char, @explevel, @gainExp, @action, @dice) ->
     hp = utils.dice(@explevel, 8) # NETHACK LOGIC
     super(null, @role, hp, @explevel, @gainExp, @dice)

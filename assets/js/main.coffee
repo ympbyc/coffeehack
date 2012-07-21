@@ -20,7 +20,7 @@
   messagelist, monsterlist, commands, items, ninjitsulist, traplist
   Player, Monster
   Item, Weapon
-  Map
+  Map, Tile
   utils
 } = hack
 
@@ -31,11 +31,11 @@ MESSAGE_SIZE = 4 #number of massages to save
 
 main  = ->
   game = new hack.Game()
-  game.setPlayer(new hack.Player('coffeedrinker', 'Ninja', 12))
-  game.addMap(new hack.Map(MAP_WIDTH, MAP_HEIGHT))
+  game.setPlayer(new Player('coffeedrinker', 'Ninja', 12))
+  game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
   game.nextMap()
   game.player.born(game.currentMap())
-  tile = new hack.Tile('ch-canvas') #set up the canvas element
+  tile = new Tile('ch-canvas') #set up the canvas element
   currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
 
   message = [

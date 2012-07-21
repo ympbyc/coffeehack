@@ -3,12 +3,11 @@
 # Defines the properties and behaviour of a character
 # Monsters extend this class therefore if the word 'player' appears
 # in this file, it also represents monsters
-#
-# dependencie - utils.coffee
 ###
 
-{utils} = hack
-class hack.Player extends hack.EventEmitter
+{utils, EventEmitter} = hack
+
+class hack.Player extends EventEmitter
 
   ## explevel vs experience
   #
