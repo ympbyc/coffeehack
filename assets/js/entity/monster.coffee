@@ -1,3 +1,5 @@
+#= require player
+
 ###
 # monster.coffeee
 # Monsters are players, with an extended method move.
