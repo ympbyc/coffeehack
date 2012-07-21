@@ -1,3 +1,5 @@
+#= require game
+
 ###
 # main.js
 # Handles all the user interaction, and bridges between classes.

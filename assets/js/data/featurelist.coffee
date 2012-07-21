@@ -1,3 +1,5 @@
+#= require ../entity/map
+
 hack.features = features = (->
   featurelist = [
     #small room
