@@ -1,4 +1,4 @@
-CH.monsterlist = [
+hack.monsterlist = [
   #[name, difficulty, chr, level, exp, attack, [n, x]]
   ['grid bug', 1, 'x', 0, 4, 'bites', [1,1]]
   ['jackal', 1, 'd', 0, 1, 'bites', [1,2]]

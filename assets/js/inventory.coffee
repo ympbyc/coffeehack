@@ -1,4 +1,4 @@
-class Inventory extends CH.EventEmitter
+class hack.Inventory extends hack.EventEmitter
   @validchars = ['a','b','c','d','e','f','g','h','i','j','k'] # ...
 
   constructor : ->
@@ -37,4 +37,3 @@ class Inventory extends CH.EventEmitter
   listItems : ->
     @_inventory
 
-CH.Inventory = Inventory

@@ -1,6 +1,6 @@
 # dependencie - index.html
 
-class Tile
+class hack.Tile
   CELL_SIZE = 16
   WIDTH = CELL_SIZE*25
   HEIGHT = CELL_SIZE*18
@@ -83,5 +83,3 @@ class Tile
 
   resetWithMap : ->
     @surface.drawImage(@currentMapImage, 0, 0)
-
-CH.Tile = Tile

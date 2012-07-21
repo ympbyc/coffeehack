@@ -14,28 +14,28 @@
 #                (tile.coffee), traplist.coffee, itemlist.coffee, item.coffee
 ###
 
+{
+  messagelist, monsterlist, commands, items, ninjitsulist, traplist
+  Player, Monster
+  Item, Weapon
+  Map
+  utils
+} = hack
+
 MAP_WIDTH = 40
 MAP_HEIGHT = 30
 MAX_MONSTER = 10 #maximum number of monsters that can exist on the map
 MESSAGE_SIZE = 4 #number of massages to save
 
 main  = ->
-  utils = CH.utils
-  commands = CH.commands
-  monsterlist = CH.monsterlist
-  traplist = CH.traplist
-  items = CH.items
-  ninjitsulist = CH.ninjitsulist
-  messagelist = CH.messagelist
-  Map = CH.Map
-
-  game = new CH.Game()
-  game.setPlayer(new CH.Player('coffeedrinker', 'Ninja', 12))
-  game.addMap(new CH.Map(MAP_WIDTH, MAP_HEIGHT))
+  game = new hack.Game()
+  game.setPlayer(new hack.Player('coffeedrinker', 'Ninja', 12))
+  game.addMap(new hack.Map(MAP_WIDTH, MAP_HEIGHT))
   game.nextMap()
   game.player.born(game.currentMap())
-  tile = new CH.Tile('ch-canvas') #set up the canvas element
-  currentmonsterlist = (m for m in CH.monsterlist when m[1] <= 1)
+  tile = new hack.Tile('ch-canvas') #set up the canvas element
+  currentmonsterlist = (m for m in monsterlist when m[1] <= 1)
+
   message = [
     '',
     '',
@@ -77,7 +77,7 @@ main  = ->
   game.on('turn', ->
     # add a monster
     if (Math.random()*10 < 0.5 and game.countMonster() < MAX_MONSTER)
-      monster = new CH.Monster(currentmonsterlist[utils.randomInt(currentmonsterlist.length)]...) # NETHACK LOGIC
+      monster = new Monster(currentmonsterlist[utils.randomInt(currentmonsterlist.length)]...) # NETHACK LOGIC
       monster.on('attack', (e) ->
         tgt = if e.enemy.name then 'You' else 'the ' + e.enemy.role
         action = if Math.round(Math.random()) then e.me.action else 'hits'
@@ -86,7 +86,7 @@ main  = ->
       # monsters occasionaly drop weapons
       monster.on('die', (e) ->
         pos = e.beef.getPosition()
-        weapon = new CH.Weapon(items.weapons[utils.randomInt(items.weapons.length)]...)
+        weapon = new Weapon(items.weapons[utils.randomInt(items.weapons.length)]...)
         if weapon.rareness > utils.randomInt(100)
           game.addItem(pos.x, pos.y, weapon)
         else
@@ -126,7 +126,7 @@ main  = ->
   ###
   game.on('godown', ->
     if not game.nextMap() #false when there is no map deeper than the current
-      game.addMap(new CH.Map(MAP_WIDTH, MAP_HEIGHT))
+      game.addMap(new Map(MAP_WIDTH, MAP_HEIGHT))
       game.nextMap()
     map = game.currentMap()
     game.player.born(map, map.stair_pos_up)
@@ -277,9 +277,9 @@ main  = ->
       tile.resetWithMap()
       for i,row of objectLayer
         for j, cell of row
-          if cell instanceof CH.Player
+          if cell instanceof Player
             tile.update(j, i, 'monster', cell.role)
-          else if cell instanceof CH.Weapon
+          else if cell instanceof Weapon
             tile.update(j, i, 'weapon', cell.name)
 
   updateCanvasMap(game.currentMap().show())
