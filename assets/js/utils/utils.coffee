@@ -1,10 +1,7 @@
 hack.utils = utils = {}
-utils.randomInt = (max) ->
-  Math.floor(Math.random()*max)
 
-utils.dice = (n, x) ->
-  n = n or 1
-  x = x or 4
-  p = 0
-  p +=  utils.randomInt((x-1)+1) for i in [1..n]
-  p
+utils.randomInt = (max) -> ~~(Math.random()*max)
+
+utils.dice = (n = 1, x = 4) ->
+  nums = (utils.randomInt(x) for i in [1..n])
+  _.foldl nums, ((m, n) -> m + n), 0
