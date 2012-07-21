@@ -6,6 +6,7 @@
 ###
 
 {utils, EventEmitter} = hack
+{randomInt} = utils
 
 class hack.Player extends EventEmitter
 
@@ -41,8 +42,8 @@ class hack.Player extends EventEmitter
   born : (map, pos=null) ->
     nextPos = if pos? then pos else
       {
-        x : Math.floor(Math.random()*map.width)
-        y : Math.floor(Math.random()*map.height)
+        x : randomInt(map.width)
+        y : randomInt(map.height)
       }
     if map.isWalkable(nextPos.x, nextPos.y)
       @_position = nextPos
