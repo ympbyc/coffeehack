@@ -3,12 +3,14 @@ class hack.EventEmitter
     @listenerStack = []
 
   on : (type, listener) ->
-    @listenerStack.push({type:type, listener:listener})
+    @listenerStack.push
+      type    : type
+      listener: listener
 
   off : (type, listener) ->
-    for i in [0 ... @listenerStack.length]
-     @listenerStack[i] = undefined if @listenerStack[i] and @listenerStack[i].type is type and @listenerStack[i].listener is listener
+    for stack, i in @listenerStack when (stack?.type is type) and (stack?.listener is listener)
+      @listenerStack[i] = undefined
 
   fire : (type, obj) ->
-    for item in @listenerStack
-      item.listener(obj) if item and item.type is type
+    for item in @listenerStack when item?.type is type
+      item.listener(obj)
