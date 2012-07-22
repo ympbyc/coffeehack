@@ -3,12 +3,12 @@
 # Defines the properties and behaviour of a character
 # Monsters extend this class therefore if the word 'player' appears
 # in this file, it also represents monsters
-#
-# dependencie - utils.coffee
 ###
 
-{utils} = hack
-class hack.Player extends hack.EventEmitter
+{utils, EventEmitter} = hack
+{randomInt} = utils
+
+class hack.Player extends EventEmitter
 
   ## explevel vs experience
   #
@@ -42,8 +42,8 @@ class hack.Player extends hack.EventEmitter
   born : (map, pos=null) ->
     nextPos = if pos? then pos else
       {
-        x : Math.floor(Math.random()*map.width)
-        y : Math.floor(Math.random()*map.height)
+        x : randomInt(map.width)
+        y : randomInt(map.height)
       }
     if map.isWalkable(nextPos.x, nextPos.y)
       @_position = nextPos
