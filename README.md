@@ -18,6 +18,9 @@ It runs on the latest web browsers which support html5 canvas.
       ; - eximine the cell you are on
       , - pick up an item
       i - show the inventory
+      d - drop an item
+      w - wield a weapon
+      x - auto-explore (buggy)
       > - go down (available only when you are on a downward staircese)
       < - go up (available only when you are on a upward staircese)
 

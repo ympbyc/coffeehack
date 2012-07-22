@@ -69,7 +69,7 @@ hack.commands = {
       if map.isWalkable(x, y) or map.isAttackable(x, y) then true
       else false
 
-    if map.getCell(pp.x, pp.y) is Map.STAIR_DOWN then commands['>'](game)
+    if map.getCell(pp.x, pp.y) is Map.STAIR_DOWN then hack.commands['>'](game)
     else if isOkToGo(pp.x+dir.x, pp.y+dir.y)
       if not isOkToGo(pp.x+dir.hx, pp.y+dir.hy)
         game.player.walk(map, dir.d)
