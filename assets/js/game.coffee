@@ -1,4 +1,5 @@
-class hack.Game extends hack.EventEmitter
+{EventEmitter} = hack
+class hack.Game extends EventEmitter
   constructor : ->
     super()
     @monsterStack = [[]] #y-axis holds floor levels
