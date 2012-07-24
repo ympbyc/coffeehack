@@ -56,7 +56,7 @@ class hack.Player extends EventEmitter
     maxHP = [12, 18, 26, 36, 48, 62, 80, 100]
     maxHP[@explevel] || maxHP[maxHP.length-1]
 
-  ## Generate a random coordinate, test for its availability
+  ## test for the availability of the given cell
   ## if there is nothing in the way, move to it, clear the reservation of the current cell, and reserve the new cell.
   #
   walk : (map, direction) ->
@@ -127,6 +127,5 @@ class hack.Player extends EventEmitter
 
   wield : (ch) ->
     weapon = @inventory.getItem(ch) or null
-    console.log weapon
     @dice = weapon.dice if weapon?
     weapon

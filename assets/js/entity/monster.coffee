@@ -17,11 +17,11 @@ class hack.Monster extends Player
   move : (map, x, y) ->
     fallback = (->
       table = ['u', 'd', 'r', 'l']
-      @walk(map, table[Math.floor(Math.random()*4)])).bind(@)
+      @walk(map, table[utils.randomInt(4)])).bind(@)
     if not x? or not y?
       fallback()
     else
-      if Math.floor(Math.random()*10) < 2 then fallback()
+      if utils.randomInt(10) < 2 then fallback()
       else
         mp = @getPosition()
         direction = (
