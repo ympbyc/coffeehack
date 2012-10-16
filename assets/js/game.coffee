@@ -1,4 +1,5 @@
 {EventEmitter} = hack
+
 class hack.Game extends EventEmitter
   constructor : ->
     super()

@@ -8,8 +8,6 @@
 # The only file you have to modify when you port this project to a new environment is this.
 # This version targets html5 web browsers.
 #
-# Newing classes should only happen in this file.
-#
 # dependencies - command.coffee, game.coffee, (index.html),
 #                (lib/jquery), map.coffee, messagelist.coffee, monster.coffee,
 #                monsterlist.coffee, (nhtiles/*.gif), ninjitsulist.coffee, player.coffee,
