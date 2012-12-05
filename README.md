@@ -32,3 +32,5 @@ It runs on the latest web browsers which support html5 canvas.
 npm install
 coffee app.coffee
 ```
+
+Then access http://localhost:3000 in your browser
