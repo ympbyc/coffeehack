@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>coffeehack</title>
+    <%- js('all') %>
+    
+    <style type="text/css">
+      body {
+        font-size : 12px;
+        font-family : "Courier", monospace;
+      }
+      #jshack {
+        float : right;
+      }
+      h1 {
+        font-size : 1.1em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mainwrapper">
+      <pre id="message"></pre>
+      <canvas id="ch-canvas" width="640" height="480"></canvas>
+      <!--<pre id="jshack"></pre>-->
+      <pre id="status"></pre>
+      
+      <hr/>
+      
+      <div id="help">
+        <h1>coffeehack</h1>
+        roguelike game in your browser!
+        <h1>key-bindings</h1>
+        coffeehack's key-bindings are more or less similar to those of nethack.
+        <table>
+          <tr><td>h</td><td>move left</td></tr>
+          <tr><td>j</td><td>move backward</td></tr>
+          <tr><td>k</td><td>move upward</td></tr>
+          <tr><td>l</td><td>move right</td></tr>
+          <tr><td>&gt;</td><td>go down</td><td>Only valid when you are on a downward staircase cell</td></tr>
+          <tr><td>&lt;</td><td>go up</td><td>Only valid when you are on a upward staircase cell</td></tr>
+          <tr><td>y</td><td>answer yes to a question</td></tr>
+          <tr><td>i</td><td>show inventory</td></tr>
+          <tr><td>,</td><td>pick up an item on the floor</td></tr>
+          <tr><td>w</td><td>wield a weapn</td></tr>
+          <tr><td>d</td><td>drop an item</td></tr>
+          <tr><td>x</td><td>auto-explore (buggy)</td></tr>
+          
+          <tr><td>anything else</td><td>rest on the current cell</td></tr>
+        </table>
+        <h1>ninjitsu</h1>
+        There are special cells on the map which are shown as an "*" character (if you are playing the text-mode).
+        When you are on that cell, you can use one of many ninjitsus that helps you defeating the monsters.
+        A message should appear in the message area at the top asking you if you wanna use that jitsu or not.
+        If you do, you press "y" key otherwise press any key other than "y".
+      </div>
+    </div>
+  </body>
+</html>
